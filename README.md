@@ -1,2 +1,1 @@
-# win_py_Greeting
-Greeting Unit for windows
+# jet_py_Greeting
