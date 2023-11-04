@@ -218,8 +218,8 @@ def greet(d, url, max_sim, detect_name):
     #挨拶音声再生
     utter = talk.greeting(d, detect_name, talk.level_to_utterance(level))
 
-    #モーションズレ補正
-    time.sleep(0.5)
+#    #モーションズレ補正
+#    time.sleep(0.5)
 
     #挨拶モーション再生
     motion.set_level_motion(level)

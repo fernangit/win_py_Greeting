@@ -43,7 +43,7 @@ def set_default_motion(now_time):
             #BGM再生
             winsound.PlaySound(sound_list[motion],  winsound.SND_FILENAME)
             #モーションズレ補正
-            time.sleep(0.5)
+            time.sleep(0.3)
         pyautogui.hotkey(dance_list[motion])
 
 #レベル対応モーション呼び出し
