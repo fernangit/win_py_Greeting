@@ -1,8 +1,6 @@
-#ブラウザを最前面に移動
-#start cscript ".\activate.vbs msedge.exe"
+rem move browser to front
 .\activate.vbs msedge.exe
-sleep 10
-#Unityを最大表示
-#echo z
-#モーション呼び出し
+rem wait 3sec
+timeout /t 3 > nul
+rem call motion
 python motion.py %1
