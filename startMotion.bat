@@ -5,4 +5,4 @@ sleep 10
 #Unityを最大表示
 #echo z
 #モーション呼び出し
-python D:\work\win_py_Greeting\motion.py %1
+python motion.py %1
