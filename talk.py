@@ -17,10 +17,9 @@ def monologue(now_time, nxt_h, nxt_m):
     if now_time.hour == nxt_h and now_time.minute == nxt_m:
         #独り言再生
         mono = random.randint(0, len_utterance_mono_lst() - 1)
-        jtalk.jtalk(utterance.mono_lst[mono])
-#        print(monologue, utterance.mono_lst[monologue])
+        talk(utterance.mono_lst[mono])
         #モーションズレ補正
-        time.sleep(0.5)
+        time.sleep(2.0)
         #口パク
         transfer.transfer_utterance(utterance.mono_lst[mono])
         time.sleep(3)
@@ -28,6 +27,12 @@ def monologue(now_time, nxt_h, nxt_m):
         nxt_m = random.randint(0, 59)
 
     return nxt_h, nxt_m
+
+#定時アナウンス
+def announce(now_time, nxt_h, nxt_m, sentence_file):
+    if now_time.hour == nxt_h and now_time.minute == nxt_m:
+        read_sentence_file(sentence_file)
+        time.sleep(3)
 
 #挨拶
 def greeting(now_time, name, op):
@@ -45,7 +50,7 @@ def greeting(now_time, name, op):
         else:
             utter = name + '　' + utterance.evg_lst[rnd] + '　' + op
 
-    jtalk.jtalk(utter)
+    talk(utter)
     return utter
 
 #読み上げ
@@ -58,30 +63,36 @@ def read_sentence_thread():
     #sentenceフォルダ読み込み
     sentence_files = glob.glob('sentences/*.txt')
     while(True):
-        for sentence in sentence_files:
-            #ファイル有無チェック
-            if os.path.isfile(sentence):
-                with open(sentence) as f:
-                    text = f.read()
-                    print(text)
-                    speak(text)
-                #読み上げ終了待ち
-                while(True):
-                    if transfer.is_talkend():
-                        break
-                    time.sleep(1)
+        for sentence_file in sentence_files:
+            read_sentence_file(sentence_file)
             time.sleep(5)
-        time.sleep(10)
+        time.sleep(180)
 
+def read_sentence_file(sentence_file):
+    #ファイル有無チェック
+    if os.path.isfile(sentence_file):
+        with open(sentence_file, encoding="utf-8") as f:
+            text = f.read()
+            print(text)
+            talk(text)
+            #モーションズレ補正
+            time.sleep(2.0)
+            #口パク
+            transfer.transfer_utterance(text)
+        #読み上げ終了待ち
+        while(True):
+            if transfer.is_talkend():
+                break
+            time.sleep(1)
 
 #発話
-def speak(sentence):
+def talk(sentence):
     #発話再生
+    thread = threading.Thread(args=(sentence, ), target = jtalk_thread)
+    thread.start()
+
+def jtalk_thread(sentence):
     jtalk.jtalk(sentence)
-    #モーションズレ補正
-    time.sleep(0.5)
-    #口パク
-    transfer.transfer_utterance(sentence)
 
 def percentage_to_level(per, thresh, motion_num):
     return transfer.transfer_percentage(per, thresh, motion_num)

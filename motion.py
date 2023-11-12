@@ -69,7 +69,7 @@ def playSound(soundPath):
 if __name__ == '__main__':
     args = sys.argv
     if 1 <= len(args):
-        print(args[1])
+        print("sound " + sound_list[int(args[1])])
         time.sleep(1)
         if os.path.isfile(sound_list[int(args[1])]) == True:
             thread = threading.Thread(target=playSound, args=(sound_list[int(args[1])],))
@@ -77,6 +77,7 @@ if __name__ == '__main__':
             #モーションズレ補正
             time.sleep(0.3)
             pyautogui.hotkey(dance_list[int(args[1])])
+            print("key press " + dance_list[int(args[1])])
             #ブラウザ最大化
             pyautogui.hotkey('z')
             thread.join()

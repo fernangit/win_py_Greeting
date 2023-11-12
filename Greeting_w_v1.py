@@ -116,6 +116,9 @@ def regulary(d, nxt_h, nxt_m, t_st):
     #独り言
     nxt_h, nxt_m = talk.monologue(d, nxt_h, nxt_m)
 
+    #定時アナウンス
+    talk.announce(d, nxt_h, nxt_m, 'sentences/announce.txt')
+
     return nxt_h, nxt_m, t_st
 
 #骨格検出
@@ -242,6 +245,9 @@ def greeting_main(url, mode = 0):
     #起動セリフ＆モーション
     opening()
     
+    #読み上げ開始
+    talk.read_sentence()
+
     while True:
         cv.waitKey(1)
         greeting = False
@@ -251,9 +257,6 @@ def greeting_main(url, mode = 0):
 
         #定期的セリフ＆モーション
         nxt_h, nxt_m, t_st = regulary(d, nxt_h, nxt_m, t_st)
-
-        #読み上げ
-        talk.read_sentence()
 
         #画面キャプチャ
         hasFrame, frame = cap.read()
