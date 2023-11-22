@@ -41,9 +41,10 @@ def set_default_motion(now_time):
         motion = random.randint(0, len(dance_list) - 1)
         if os.path.isfile(sound_list[motion]) == True:
             #BGM再生
-            winsound.PlaySound(sound_list[motion],  winsound.SND_FILENAME)
+            thread = threading.Thread(target=playSound, args=(sound_list[motion],))
+            thread.start()
             #モーションズレ補正
-            time.sleep(0.3)
+            time.sleep(0.2)
         pyautogui.hotkey(dance_list[motion])
 
 #レベル対応モーション呼び出し
@@ -75,7 +76,7 @@ if __name__ == '__main__':
             thread = threading.Thread(target=playSound, args=(sound_list[int(args[1])],))
             thread.start()
             #モーションズレ補正
-            time.sleep(0.3)
+            time.sleep(0.2)
             pyautogui.hotkey(dance_list[int(args[1])])
             print("key press " + dance_list[int(args[1])])
             #ブラウザ最大化

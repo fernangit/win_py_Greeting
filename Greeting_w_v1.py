@@ -22,6 +22,7 @@ import regist_detected
 import send_receive_server
 import image_filter
 import hand_gesture
+import ELYZA_chat
 
 #gesture
 H_NO_GESTURE = 0
@@ -246,7 +247,10 @@ def greeting_main(url, mode = 0):
     opening()
     
     #読み上げ開始
-    talk.read_sentence()
+#    talk.read_sentence()
+
+    #会話開始
+#    ELYZA_chat.chat_sentence()
 
     while True:
         cv.waitKey(1)
@@ -294,6 +298,8 @@ def greeting_main(url, mode = 0):
             motion.set_goodjob_motion()
             #OK
             #regist_name(detect_name)
+            talk.talk('あざーっす')
+            time.sleep(3)
         
         #debug
         cv.imshow('Image', frame)

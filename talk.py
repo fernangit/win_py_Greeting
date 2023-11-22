@@ -72,18 +72,20 @@ def read_sentence_file(sentence_file):
     #ファイル有無チェック
     if os.path.isfile(sentence_file):
         with open(sentence_file, encoding="utf-8") as f:
-            text = f.read()
-            print(text)
-            talk(text)
-            #モーションズレ補正
-            time.sleep(2.0)
-            #口パク
-            transfer.transfer_utterance(text)
-        #読み上げ終了待ち
-        while(True):
-            if transfer.is_talkend():
-                break
-            time.sleep(1)
+            read_text(f.read())
+
+def read_text(text):
+    print(text)
+    talk(text)
+    #モーションズレ補正
+    time.sleep(2.0)
+    #口パク
+    transfer.transfer_utterance(text)
+    #読み上げ終了待ち
+    while(True):
+        if transfer.is_talkend():
+            break
+        time.sleep(1)
 
 #発話
 def talk(sentence):

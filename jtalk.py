@@ -7,6 +7,7 @@ def jtalk(t):
     open_jtalk=['open_jtalk/open_jtalk.exe']
     mech=['-x','open_jtalk/dic']
     htsvoice=['-m','open_jtalk/voice/mei/mei_happy.htsvoice']
+#    htsvoice=['-m','open_jtalk/voice/mei/mei_normal.htsvoice']
     speed=['-r','1.0']
     outwav=['-ow','open_jtalk.wav']
     cmd=open_jtalk+mech+htsvoice+speed+outwav
