@@ -22,7 +22,7 @@ import regist_detected
 import send_receive_server
 import image_filter
 import hand_gesture
-import ELYZA_chat
+import LLM_chat
 
 #gesture
 H_NO_GESTURE = 0
@@ -249,8 +249,9 @@ def greeting_main(url, mode = 0):
     #読み上げ開始
 #    talk.read_sentence()
 
-    #会話開始
-#    ELYZA_chat.chat_sentence()
+    #チャット
+    llm_chat = LLM_chat.chat()
+    chatmode = False
 
     while True:
         cv.waitKey(1)
@@ -270,8 +271,8 @@ def greeting_main(url, mode = 0):
         #入力フレーム補正
         frame = correct_frame(frame)
 
-        # #前回から7秒以上経過？
-        if (time.time() - t_st) > 7:
+        #前回から7秒以上経過？
+        if ((time.time() - t_st) > 7) and (chatmode == False):
             #元画像を保存
             org_frame = copy.copy(frame)
 
@@ -299,8 +300,26 @@ def greeting_main(url, mode = 0):
             #OK
             #regist_name(detect_name)
             talk.talk('あざーっす')
+            
+            if chatmode == False:
+                chatmode = True
+                #会話開始
+                llm_chat.begin()
+                print("chatmode ", chatmode)
+            else:
+                chatmode = False
+                #会話終了
+                llm_chat.end()
+                print("chatmode over", chatmode)
+                
             time.sleep(3)
-        
+
+        #1分間会話がなければ挨拶モードに戻る
+        if (chatmode == True) and ((time.time() - llm_chat.get_chat_time()) > 60):
+            chatmode = False
+            llm_chat.end()
+            print("chatmode ", chatmode)
+            
         #debug
         cv.imshow('Image', frame)
 

@@ -79,8 +79,10 @@ if __name__ == '__main__':
             time.sleep(0.2)
             pyautogui.hotkey(dance_list[int(args[1])])
             print("key press " + dance_list[int(args[1])])
+            time.sleep(1.0)
             #ブラウザ最大化
             pyautogui.hotkey('z')
+            print("key press z")
             thread.join()
         else:
             print(sound_list[int(args[1])] + " is not exist.")

@@ -78,7 +78,7 @@ def read_text(text):
     print(text)
     talk(text)
     #モーションズレ補正
-    time.sleep(2.0)
+    time.sleep(0.2)
     #口パク
     transfer.transfer_utterance(text)
     #読み上げ終了待ち

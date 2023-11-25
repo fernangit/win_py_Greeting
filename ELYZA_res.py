@@ -1,16 +1,24 @@
 import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
 B_INST, E_INST = "[INST]", "[/INST]"
 B_SYS, E_SYS = "<<SYS>>\n", "\n<</SYS>>\n\n"
 DEFAULT_SYSTEM_PROMPT = "あなたは20歳の受付の女性です。名前はまうです。"
+
+# quantization_config = BitsAndBytesConfig(
+#     load_in_4bit=True,
+#     bnb_4bit_use_double_quant=True,
+#     bnb_4bit_quant_type="nf4",
+#     bnb_4bit_compute_dtype=torch.bfloat16,
+# )
 
 model_name = "elyza/ELYZA-japanese-Llama-2-7b-fast-instruct"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 #CPUだとメモリオーバーなので
-#device = "cpu"
+device = "cpu"
+#model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype="auto", quantization_config=quantization_config,).to(device)
 model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype="auto").to(device)
 
 def elyza_response(text):
@@ -37,7 +45,7 @@ def elyza_response(text):
 if __name__ == '__main__':
     while(True):
         text = input('?(qで終了):')
-        if text == 'q' or 'Q':
+        if text == 'q' or text == 'Q':
             print('finished')
             break
 
