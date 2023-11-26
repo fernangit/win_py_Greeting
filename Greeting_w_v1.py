@@ -310,7 +310,7 @@ def greeting_main(url, mode = 0):
                 chatmode = False
                 #会話終了
                 llm_chat.end()
-                print("chatmode over", chatmode)
+                print("chatmode ", chatmode)
                 
             time.sleep(3)
 
@@ -318,7 +318,7 @@ def greeting_main(url, mode = 0):
         if (chatmode == True) and ((time.time() - llm_chat.get_chat_time()) > 60):
             chatmode = False
             llm_chat.end()
-            print("chatmode ", chatmode)
+            print("chatmode over ", chatmode, (time.time() - llm_chat.get_chat_time()))
             
         #debug
         cv.imshow('Image', frame)

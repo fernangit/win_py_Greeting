@@ -22,6 +22,7 @@ class chat():
 
     def begin(self):
         print("begin")
+        self.chat_time = time.time()
         self.started.set()
 
     def end(self):
@@ -55,9 +56,9 @@ class chat():
     def chat_sentence_thread(self):
         self.started.wait()
         while self.alive:
-            self.chat_time = time.time()
             talk.read_text(self.llm_chat())
             self.started.wait()
+            self.chat_time = time.time()
               
 if __name__ == '__main__':
     test = chat()
