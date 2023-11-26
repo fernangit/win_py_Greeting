@@ -2,6 +2,7 @@ import threading
 import speech_recognition as sr
 #import ELYZA_res
 #import LINE_res
+#import rinna_res
 import talk
 import time
 from datetime import datetime, timedelta
@@ -48,6 +49,7 @@ class chat():
             print(user_message)
     #        response = ELYZA_res.elyza_response(user_message)
     #        response = LINE_res.elyza_response(user_message)
+    #        response = rinna_res.elyza_response(user_message)
         except:
             response = 'すみません、もういちどおねがいしますー'
 
