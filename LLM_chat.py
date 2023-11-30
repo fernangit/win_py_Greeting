@@ -1,8 +1,9 @@
 import threading
 import speech_recognition as sr
-#import ELYZA_res
+import ELYZA_res
 #import LINE_res
 #import rinna_res
+#import rinna_gptq_res
 import talk
 import time
 from datetime import datetime, timedelta
@@ -14,6 +15,9 @@ class chat():
         self.chat_time = time.time()
         self.r = sr.Recognizer()
         self.mic = sr.Microphone(device_index = 0)
+        self.user_message = ''
+        self.response = ''
+        self.before = ''
 
         self.thread = threading.Thread(target=self.chat_sentence_thread)
         self.thread.start()
@@ -24,6 +28,7 @@ class chat():
     def begin(self):
         print("begin")
         self.chat_time = time.time()
+        self.before = ''
         self.started.set()
 
     def end(self):
@@ -45,15 +50,22 @@ class chat():
             audio = self.r.listen(source)
 
         try:
-            user_message = self.r.recognize_google(audio, language='ja-JP')
-            print(user_message)
-    #        response = ELYZA_res.elyza_response(user_message)
-    #        response = LINE_res.elyza_response(user_message)
-    #        response = rinna_res.elyza_response(user_message)
+            t1 = time.time()
+            self.user_message = self.r.recognize_google(audio, language='ja-JP')
+            t2 = time.time()
+            print(self.user_message)
+            self.response = ELYZA_res.elyza_response(self.user_message)
+    #        response = LINE_res.line_response(user_message)
+    #        response = rinna_res.rinnna_response(user_message)
+    #        response = rinna_gptq_res.rinna_gptq_response(user_message, self.before)
+            t3 = time.time()
+            self.before = response
+            print('talk recognize:', t2 - t1)
+            print('response create:', t3 - t2)
         except:
-            response = 'すみません、もういちどおねがいしますー'
+            self.response = 'すみません、もういちどおねがいしますー'
 
-        return response
+        return self.response
 
     def chat_sentence_thread(self):
         self.started.wait()
@@ -61,7 +73,13 @@ class chat():
             talk.read_text(self.llm_chat())
             self.started.wait()
             self.chat_time = time.time()
-              
+
+    def get_user_message(self):
+        return self.user_message
+
+    def get_response(self):
+        return self.response
+
 if __name__ == '__main__':
     test = chat()
     test.begin()

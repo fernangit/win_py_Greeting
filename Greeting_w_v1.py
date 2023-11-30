@@ -229,7 +229,7 @@ def greet(d, url, max_sim, detect_name):
     motion.set_level_motion(level)
     
     #発話内容をサーバーに送信
-    send_receive_server.send_utterance(url, utter, str(max_sim))
+    send_receive_server.send_utterance(url, utter, str(max_sim), '', '')
 
     #発話内容をリセット
     threading.Thread(target=reset_utterance, args=(url,)).start()
@@ -252,7 +252,9 @@ def greeting_main(url, mode = 0):
     #チャット
     llm_chat = LLM_chat.chat()
     chatmode = False
-
+    message = old_message = ''
+    response = old_response = ''
+    
     while True:
         cv.waitKey(1)
         greeting = False
@@ -303,6 +305,8 @@ def greeting_main(url, mode = 0):
             
             if chatmode == False:
                 chatmode = True
+                message = old_message = ''
+                response = old_response = ''
                 #会話開始
                 llm_chat.begin()
                 print("chatmode ", chatmode)
@@ -310,6 +314,7 @@ def greeting_main(url, mode = 0):
                 chatmode = False
                 #会話終了
                 llm_chat.end()
+                reset_utterance(url)
                 print("chatmode ", chatmode)
                 
             time.sleep(3)
@@ -319,6 +324,19 @@ def greeting_main(url, mode = 0):
             chatmode = False
             llm_chat.end()
             print("chatmode over ", chatmode, (time.time() - llm_chat.get_chat_time()))
+
+        #会話取得
+        if chatmode == True:
+            message = llm_chat.get_user_message()
+            if message != old_message:
+                old_message = message
+                response = ''
+                send_receive_server.send_utterance(url, '', '0', message, response)
+
+            response = llm_chat.get_response()
+            if response != old_response:
+                old_response = response
+                send_receive_server.send_utterance(url, '', '0', message, response)
             
         #debug
         cv.imshow('Image', frame)
@@ -326,7 +344,7 @@ def greeting_main(url, mode = 0):
 #発話内容をリセット
 def reset_utterance(url):
     time.sleep(7)
-    send_receive_server.send_utterance(url, '', '0')
+    send_receive_server.send_utterance(url, '', '0', '', '')
 
 if __name__ == '__main__':
     # #args[1] = server url ex.localhost:8000

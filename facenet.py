@@ -18,6 +18,8 @@ MOUTH_RIGHT = 4
 
 #### GPUチェック
 device = torch.device('cuda:0') if torch.cuda.is_available() else torch.device('cpu')
+#LLM_chatを使用する時はCPUで動かす
+device = 'cpu'
 print('Using device:', device)
 
 #### MTCNN ResNet のモデル読み込み

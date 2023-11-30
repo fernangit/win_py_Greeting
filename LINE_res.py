@@ -9,8 +9,6 @@ model_name = "line-corporation/japanese-large-lm-3.6b"
 tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=False)
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-#CPUだとメモリオーバーなので
-#device = "cpu"
 model = AutoModelForCausalLM.from_pretrained(model_name).to(device)
 generator = pipeline("text-generation", model=model, tokenizer=tokenizer, device=device)
 
@@ -23,8 +21,11 @@ def line_response(text):
         pad_token_id=tokenizer.pad_token_id,
         num_return_sequences=5,
     )
-    
-    print(output)
+    out = output[0]
+    out = out["generated_text"].replace(DEFAULT_SYSTEM_PROMPT, "")
+    outs = out.split('。')
+    print(outs[0])
+    return outs[0]
 
 if __name__ == '__main__':
     while(True):
