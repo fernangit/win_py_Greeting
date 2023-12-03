@@ -305,16 +305,17 @@ def greeting_main(url, mode = 0):
             
             if chatmode == False:
                 chatmode = True
-                message = old_message = ''
-                response = old_response = ''
+                message = ''
+                response = ''
                 #会話開始
+                send_receive_server.send_utterance(url, '', '0', '', '')
                 llm_chat.begin()
                 print("chatmode ", chatmode)
             else:
                 chatmode = False
                 #会話終了
                 llm_chat.end()
-                reset_utterance(url)
+                send_receive_server.send_utterance(url, '', '0', '', '')
                 print("chatmode ", chatmode)
                 
             time.sleep(3)
@@ -323,6 +324,7 @@ def greeting_main(url, mode = 0):
         if (chatmode == True) and ((time.time() - llm_chat.get_chat_time()) > 60):
             chatmode = False
             llm_chat.end()
+            send_receive_server.send_utterance(url, '', '0', '', '')
             print("chatmode over ", chatmode, (time.time() - llm_chat.get_chat_time()))
 
         #会話取得

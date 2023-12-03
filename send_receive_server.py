@@ -9,8 +9,8 @@ def send_utterance(url, utterance, score, message, response):
 
 def receive_utterance(url):
     print(url)
-    utterance = requests.get(url).content.decode('cp932')
-#    utterance = requests.get(url).content.decode('utf_8')
+#    utterance = requests.get(url).content.decode('cp932')
+    utterance = requests.get(url).content.decode('utf_8')
     print(utterance)
     return utterance
 

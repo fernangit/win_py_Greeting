@@ -42,9 +42,12 @@ def elyza_response(text):
             eos_token_id=tokenizer.eos_token_id,
         )
     output = tokenizer.decode(output_ids.tolist()[0][token_ids.size(1) :], skip_special_tokens=True)
-    output = output.replace('\n', '')
-    print(output)
-    return output
+#    output = output.replace('\n', '')
+#    print(output)
+#    return output
+    outs = output.split('\n')
+    print(outs[0])
+    return outs[0]
 
 if __name__ == '__main__':
     while(True):
