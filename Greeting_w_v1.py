@@ -24,10 +24,16 @@ import image_filter
 import hand_gesture
 import LLM_chat
 
+#speach recognition mode
+SPEECH_RECOGNITION_GOOGLE = 0
+SPEECH_RECOGNITION_JULIUS = 1
+
 #gesture
 H_NO_GESTURE = 0
 H_THUMBS_UP = 1
 H_THUMBS_DOWN = 2
+H_PAPER = 3
+H_PEACE = 4
 
 #時刻初期化
 def initialize_time():
@@ -132,8 +138,6 @@ def detect_point(hasFrame, frame, org_frame, greeting):
 
     #有効Point取り出し
     v_points= [p for p in points if p != None]
-#    print('v_points=', v_points)
-#    print('len=', len(v_points))
 
     #有効ポイント10以上
     if (len(v_points) > 10):
@@ -182,6 +186,7 @@ def authenticate_face(cropped_frame, greeting):
 #    face = facecv.detect_face(cropped_frame)
 
     #顔が見つかれば認証
+#    if (face != None) and (facenet.check_face_size(pill, face, 0.5) == True):
     if (face != None):
         #正面顔チェック
 #        front_face = facenet.frontal_face(pill)
@@ -222,9 +227,6 @@ def greet(d, url, max_sim, detect_name):
     #挨拶音声再生
     utter = talk.greeting(d, detect_name, talk.level_to_utterance(level))
 
-#    #モーションズレ補正
-#    time.sleep(0.5)
-
     #挨拶モーション再生
     motion.set_level_motion(level)
     
@@ -245,12 +247,13 @@ def greeting_main(url, mode = 0):
     
     #起動セリフ＆モーション
     opening()
+    time.sleep(7)
     
     #読み上げ開始
 #    talk.read_sentence()
 
-    #チャット
-    llm_chat = LLM_chat.chat()
+    # #チャット
+    llm_chat = LLM_chat.chat(SPEECH_RECOGNITION_JULIUS)
     chatmode = False
     message = old_message = ''
     response = old_response = ''
@@ -296,13 +299,13 @@ def greeting_main(url, mode = 0):
                 t_st = time.time()
         
         #OK gesture
-        if hand_gesture.detect_hand_gesture(frame) == H_THUMBS_UP:
+        h_gesture = hand_gesture.detect_hand_gesture(frame)
+        if h_gesture == H_THUMBS_UP:
             #OK motion
             motion.set_goodjob_motion()
             #OK
             #regist_name(detect_name)
-            talk.talk('あざーっす')
-            
+            talk.talk('あざーっす')           
             if chatmode == False:
                 chatmode = True
                 message = ''
@@ -316,8 +319,18 @@ def greeting_main(url, mode = 0):
                 #会話終了
                 llm_chat.end()
                 send_receive_server.send_utterance(url, '', '0', '', '')
-                print("chatmode ", chatmode)
-                
+                print("chatmode ", chatmode)                
+            time.sleep(3)       
+        #response
+        elif h_gesture == H_PAPER:
+            #response1 motion
+            motion.set_response1_motion()
+            talk.talk('おーーーーーーーーーーいぇいいぇいいぇいいぇいいぇいいぇいいぇいいぇい')           
+            time.sleep(3)
+        elif h_gesture == H_PEACE:
+            #response2 motion
+            motion.set_response2_motion()
+            talk.talk('ピーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーース')           
             time.sleep(3)
 
         #1分間会話がなければ挨拶モードに戻る

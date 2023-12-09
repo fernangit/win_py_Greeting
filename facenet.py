@@ -70,17 +70,17 @@ def frontal_face(frame):
 
     #顔の向きを判定
     is_frontal = True
-
+    
     #目の位置関係をチェック
-    left_eye_nose = math.sqrt(((left_eye[0] - nose[0])**2) + ((left_eye[1] - nose[0])**2))
-    right_eye_nose = math.sqrt(((right_eye[0] - nose[0])**2) + ((right_eye[1] - nose[0])**2))
+    left_eye_nose = math.sqrt(((left_eye[0] - nose[0])**2) + ((left_eye[1] - nose[1])**2))
+    right_eye_nose = math.sqrt(((right_eye[0] - nose[0])**2) + ((right_eye[1] - nose[1])**2))
     print('distance ratio LReyes-nose:', (left_eye_nose / right_eye_nose))
     if (left_eye_nose / right_eye_nose > 1.05) or (left_eye_nose / right_eye_nose < 0.95):
         is_frontal = False
 
     #口の位置関係をチェック
-    mouth_left_nose = math.sqrt(((mouth_left[0] - nose[0])**2) + ((mouth_left[1] - nose[0])**2))
-    mouth_right_nose = math.sqrt(((mouth_right[0] - nose[0])**2) + ((mouth_right[1] - nose[0])**2))
+    mouth_left_nose = math.sqrt(((mouth_left[0] - nose[0])**2) + ((mouth_left[1] - nose[1])**2))
+    mouth_right_nose = math.sqrt(((mouth_right[0] - nose[0])**2) + ((mouth_right[1] - nose[1])**2))
     print('distance ratio mouthLR-nose:', (mouth_left_nose / mouth_right_nose))
     if (mouth_left_nose / mouth_right_nose > 1.05) or (mouth_left_nose / mouth_right_nose < 0.95):
         is_frontal = False
@@ -96,6 +96,16 @@ def detect_face(img, path=''):
         return mtcnn(img)
     else:
         return mtcnn(img, save_path=path)
+
+### 顔検出
+def check_face_size(img, face, th):
+    w, h = img.size
+    fw, fh = face.size
+    
+    if (fw/w < th) or (fh/w < th):
+        return False
+    
+    return True
 
 ### ベクトルの保存
 def save_feature_vector(inp, outp):

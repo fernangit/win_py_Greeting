@@ -8,6 +8,8 @@ import math
 H_NO_GESTURE = 0
 H_THUMBS_UP = 1
 H_THUMBS_DOWN = 2
+H_PAPER = 3
+H_PEACE = 4
 
 fingertop = [5, 9, 13, 17, 21]
 fingerbot = [3, 6, 10, 14, 18]
@@ -54,6 +56,36 @@ def detect_thumbs_updown(hand):
     else:
         return False
 
+#パー
+def detect_paper(hand):
+    #すべての指先が第三関節より上
+    for i in range(len(fingertop)):
+        if hand[fingertop[i]-1][1] > hand[fingerbot[i]-1][1]:
+            return False
+    #すべての指先が手のひらより上
+    for i in range(len(fingertop)):
+        if hand[fingertop[i]-1][1] > hand[0][1]:
+            return False
+    #親指以外の指先が親指先より上
+    for i in range(len(fingertop)-1):
+        if hand[fingertop[i+1]-1][1] > hand[fingertop[0]-1][1]:
+            return False
+    
+    return True
+
+#ピース
+def detect_peace(hand):
+    #人差し指、中指の指先が第三関節より上
+    for i in range(2):
+        if hand[fingertop[i+1]-1][1] > hand[fingerbot[i+1]-1][1]:
+            return False
+    #薬指、小指の指先が第三関節より上
+    for i in range(2):
+        if hand[fingertop[i+3]-1][1] < hand[fingerbot[i+3]-1][1]:
+            return False
+    
+    return True
+
 def get_landmark(hand_landmarks, hand):
     for i, lm in enumerate(hand_landmarks.landmark):
         p[hand][i][0] = lm.x
@@ -89,13 +121,19 @@ def detect_hand_gesture(img):
                 fdis = [(x / avefdis) * 100 for x in fdis]
 #                print(hl, fdis[0], fdis[1], fdis[2], fdis[3], fdis[4])
 
-                #thumbs up検出
+                #hand gesture検出
                 if detect_tumbs(fdis) == True and detect_thumbs_updown(p[hl])  == True:
                     print('thumbs up!')
                     return H_THUMBS_UP
                 elif detect_tumbs(fdis) == True and detect_thumbs_updown(p[hl]) == False:
                     print('thumbs down!')
                     return H_THUMBS_DOWN
+                elif detect_paper(p[hl]) == True:
+                    print('paper!')
+                    return H_PAPER
+                elif detect_peace(p[hl]) == True:
+                    print('peace!')
+                    return H_PEACE
 
     return H_NO_GESTURE
 

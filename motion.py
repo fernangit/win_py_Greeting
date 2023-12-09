@@ -8,15 +8,21 @@ import winsound
 import threading
 
 motion_list = ['c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x', '4']
+response1_list = ['d', 'f', 'g', 'q', 'r', 'v', 'w']
+response2_list = ['h', 'j', 'k']
 #注：dance_listとsound_listの配列番号は対応させること
-dance_list = ['2', '3', '5', '6', '7', '8', '9']
-sound_list = ['./source/sound2.wav',
+dance_list = ['1', '2', '3', '5', '6', '7', '8', '9']
+sound_list = ['./source/sound1.wav',
+              './source/sound2.wav',
               './source/sound3.wav',
               './source/sound5.wav',
               './source/sound6.wav',
               './source/sound7.wav',
               './source/sound8.wav',
               './source/sound9.wav']
+
+#緊急停止をOFF
+pyautogui.FAILSAFE = False
 
 #起動時モーション
 def set_first_motion():
@@ -27,10 +33,24 @@ def set_first_motion():
 def set_sleep_motion():
     pyautogui.hotkey('y')
 
+#Response1モーション
+def set_response1_motion():
+    pyautogui.hotkey(response1_list[random.randint(0, len(response1_list)-1)])
+
+#Response2モーション
+def set_response2_motion():
+    pyautogui.hotkey(response2_list[random.randint(0, len(response2_list)-1)])
+
 #所定時刻の所定モーション呼び出し
 def set_default_motion(now_time):
     if now_time.hour == 8 and now_time.minute == 26 and now_time.second == 21:
         #8:26 ラジオ体操
+        if os.path.isfile(sound_list[0]) == True:
+            #BGM再生
+            thread = threading.Thread(target=playSound, args=(sound_list[0],))
+            thread.start()
+            #モーションズレ補正
+            time.sleep(0.2)
         pyautogui.hotkey('1')
     if now_time.hour == 12 and now_time.minute == 30 and now_time.second == 0:
         #12:30 昼休み
@@ -38,7 +58,7 @@ def set_default_motion(now_time):
         winsound.PlaySound('昼休み.wav',  winsound.SND_FILENAME)
     if now_time.hour == 17 and now_time.minute == 00 and now_time.second == 0:
         #17:00 ダンスの時間
-        motion = random.randint(0, len(dance_list) - 1)
+        motion = random.randint(1, len(dance_list) - 1)
         if os.path.isfile(sound_list[motion]) == True:
             #BGM再生
             thread = threading.Thread(target=playSound, args=(sound_list[motion],))
