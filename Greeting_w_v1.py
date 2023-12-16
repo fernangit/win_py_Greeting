@@ -27,6 +27,7 @@ import LLM_chat
 #speach recognition mode
 SPEECH_RECOGNITION_GOOGLE = 0
 SPEECH_RECOGNITION_JULIUS = 1
+SPEECH_RECOGNITION_VOSK = 2
 
 #gesture
 H_NO_GESTURE = 0
@@ -253,7 +254,7 @@ def greeting_main(url, mode = 0):
 #    talk.read_sentence()
 
     # #チャット
-    llm_chat = LLM_chat.chat(SPEECH_RECOGNITION_JULIUS)
+    llm_chat = LLM_chat.chat(SPEECH_RECOGNITION_VOSK)
     chatmode = False
     message = old_message = ''
     response = old_response = ''
@@ -324,13 +325,13 @@ def greeting_main(url, mode = 0):
         #response
         elif h_gesture == H_PAPER:
             #response1 motion
-            motion.set_response1_motion()
-            talk.talk('おーーーーーーーーーーいぇいいぇいいぇいいぇいいぇいいぇいいぇいいぇい')           
+            res_key = motion.set_response1_motion()
+            talk.talk(talk.level_to_utterance(motion.response1_dict[res_key]))        
             time.sleep(3)
         elif h_gesture == H_PEACE:
             #response2 motion
-            motion.set_response2_motion()
-            talk.talk('ピーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーース')           
+            res_key = motion.set_response2_motion()
+            talk.talk(talk.level_to_utterance(motion.response2_dict[res_key]))        
             time.sleep(3)
 
         #1分間会話がなければ挨拶モードに戻る

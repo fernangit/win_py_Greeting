@@ -11,9 +11,11 @@ import speech_recognition as sr
 ### for julius
 import socket
 import re
+import vosk_streaming
 
 SPEECH_RECOGNITION_GOOGLE = 0
 SPEECH_RECOGNITION_JULIUS = 1
+SPEECH_RECOGNITION_VOSK = 2
 
 class chat():
     def __init__(self, mode):
@@ -28,7 +30,7 @@ class chat():
             self.mic = sr.Microphone(device_index = 0)
 
         elif self.mode == SPEECH_RECOGNITION_JULIUS:
-        ### for julius
+            ### for julius
             # ローカル環境のIPアドレス
             self.host = '127.0.0.1'
             # Juliusとの通信用ポート番号
@@ -39,6 +41,10 @@ class chat():
             self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.client.connect((self.host, self.port))
             time.sleep(2)
+
+        elif self.mode == SPEECH_RECOGNITION_VOSK:
+            ### for vosk
+            self.vosk_asr =vosk_streaming.init()
 
         self.user_message = ''
         self.response = ''
@@ -98,6 +104,9 @@ class chat():
                 for word in filter(bool, self.extracted_word.findall(self.data)):
                     self.user_message += word
 
+            if self.mode == SPEECH_RECOGNITION_VOSK:
+                self.user_message = vosk_streaming.get_message(self.vosk_asr)
+
             t2 = time.time()
             print(self.user_message)
             self.response = ELYZA_res.elyza_response(self.user_message)
@@ -127,7 +136,7 @@ class chat():
         return self.response
 
 if __name__ == '__main__':
-    test = chat(SPEECH_RECOGNITION_JULIUS)
+    test = chat(SPEECH_RECOGNITION_VOSK)
     test.begin()
     while True:
         time.sleep(1)

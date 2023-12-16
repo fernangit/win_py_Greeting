@@ -51,6 +51,7 @@ sentencepiece==0.1.99
 six==1.16.0
 sounddevice==0.4.6
 SpeechRecognition==3.10.0
+srt==3.5.3
 sympy==1.12
 tokenizers==0.15.0
 torch==2.0.0+cu118
@@ -60,3 +61,5 @@ tqdm==4.66.1
 transformers==4.35.2
 typing_extensions==4.8.0
 urllib3==2.1.0
+vosk==0.3.45
+websockets==12.0

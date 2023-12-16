@@ -9,7 +9,9 @@ import threading
 
 motion_list = ['c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x', '4']
 response1_list = ['d', 'f', 'g', 'q', 'r', 'v', 'w']
+response1_dict = {'d':1, 'f':2, 'g':3, 'q':10, 'r':11, 'v':14, 'w':15}
 response2_list = ['h', 'j', 'k']
+response2_dict = {'h':4, 'j':5, 'k':6}
 #注：dance_listとsound_listの配列番号は対応させること
 dance_list = ['1', '2', '3', '5', '6', '7', '8', '9']
 sound_list = ['./source/sound1.wav',
@@ -35,11 +37,15 @@ def set_sleep_motion():
 
 #Response1モーション
 def set_response1_motion():
-    pyautogui.hotkey(response1_list[random.randint(0, len(response1_list)-1)])
+    res_key = response1_list[random.randint(0, len(response1_list)-1)]
+    pyautogui.hotkey(res_key)
+    return res_key
 
 #Response2モーション
 def set_response2_motion():
-    pyautogui.hotkey(response2_list[random.randint(0, len(response2_list)-1)])
+    res_key = response2_list[random.randint(0, len(response2_list)-1)]
+    pyautogui.hotkey(res_key)
+    return res_key
 
 #所定時刻の所定モーション呼び出し
 def set_default_motion(now_time):

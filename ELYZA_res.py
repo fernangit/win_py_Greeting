@@ -14,6 +14,10 @@ quantization_config = BitsAndBytesConfig(
     bnb_4bit_compute_dtype=torch.bfloat16,
 )
 
+#オフラインで使用するためにキャッシュをローカルにコピーする
+#snapshots -> elyza/ELYZA-japanese-Llama-2-7b-fast-instruct
+#キャッシュの場所（例）↓
+#C:\Users\USER\.cache\huggingface\hub\models--elyza--ELYZA-japanese-Llama-2-7b-fast-instruct\snapshots\89de33d1ad568855853196802aeaecd799c6586f
 model_name = "elyza/ELYZA-japanese-Llama-2-7b-fast-instruct"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 
