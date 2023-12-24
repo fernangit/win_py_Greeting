@@ -1,50 +1,55 @@
 import threading
-import ELYZA_res
-#import LINE_res
-#import rinna_res
-#import rinna_gptq_res
 import talk
 import time
 from datetime import datetime, timedelta
-### for speach recognition
-import speech_recognition as sr
-### for julius
-import socket
-import re
-import vosk_streaming
+import LLM_model
+import speech_recog_model
 
+#speech mode
 SPEECH_RECOGNITION_GOOGLE = 0
 SPEECH_RECOGNITION_JULIUS = 1
 SPEECH_RECOGNITION_VOSK = 2
 
+#llm mode
+LLM_ELYZA = 0
+LLM_RINNA = 1
+LLM_RINNA_GPTQ = 2
+LLM_LINE = 3
+
 class chat():
-    def __init__(self, mode):
-        self.mode = mode
+    def __init__(self, speech_mode, llm_mode):
         self.started = threading.Event()
         self.alive = True
         self.chat_time = time.time()
-
-        if self.mode == SPEECH_RECOGNITION_GOOGLE:
+        #speech model
+        if speech_mode == SPEECH_RECOGNITION_GOOGLE:
             ### for speach recognition
-            self.r = sr.Recognizer()
-            self.mic = sr.Microphone(device_index = 0)
-
-        elif self.mode == SPEECH_RECOGNITION_JULIUS:
+            self.speech_model = speech_recog_model.GOOGLE_model()
+        elif speech_mode == SPEECH_RECOGNITION_JULIUS:
             ### for julius
-            # ローカル環境のIPアドレス
-            self.host = '127.0.0.1'
-            # Juliusとの通信用ポート番号
-            self.port = 10500
-            # 正規表現で認識された言葉を抽出
-            self.extracted_word = re.compile('WORD="([^"]+)"')
-            # Juliusにソケット通信で接続
-            self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.client.connect((self.host, self.port))
-            time.sleep(2)
-
-        elif self.mode == SPEECH_RECOGNITION_VOSK:
+            self.speech_model = speech_recog_model.JULIUS_model()
+        elif speech_mode == SPEECH_RECOGNITION_VOSK:
             ### for vosk
-            self.vosk_asr =vosk_streaming.init()
+            self.speech_model = speech_recog_model.VOSK_model()
+
+        self.speech_model.import_lib()
+        self.speech_ret = self.speech_model.init()
+
+        #LLM model
+        if llm_mode == LLM_ELYZA:
+            ### for ELYZA
+            self.llm_model = LLM_model.ELYZA_model()
+        elif llm_mode == LLM_RINNA:
+            ### for RINNA
+            self.llm_model = LLM_model.RINNA_model()
+        elif llm_mode == LLM_RINNA_GPTQ:
+            ### for RINNA GPTQ
+            self.llm_model = LLM_model.RINNA_GPTQ_model()
+        elif llm_mode == LLM_RINNA_GPTQ:
+            ### for LINE
+            self.llm_model = LLM_model.LINE_model()
+
+        self.llm_model.import_lib()
 
         self.user_message = ''
         self.response = ''
@@ -71,48 +76,20 @@ class chat():
         self.started.set()
         self.alive = False
         self.thread.join()
-        if self.mode == SPEECH_RECOGNITION_JULIUS:
-            ### for julius
-            print('PROCESS END')
-            self.client.send("DIE".encode('shift_jis'))
-            self.client.close()
+        self.speach_model.kill()
 
     def get_chat_time(self):
         return self.chat_time
 
     def llm_chat(self):
         self.response = '声が聞き取れませんでしたー'
-        if self.mode == SPEECH_RECOGNITION_GOOGLE:
-            ### for speach recognition
-            with self.mic as source:
-                self.r.adjust_for_ambient_noise(source)  #雑音対策
-                audio = self.r.listen(source)
-
         try:
             self.data = ""
             t1 = time.time()
-            if self.mode == SPEECH_RECOGNITION_GOOGLE:
-                ### for speach recognition
-                self.user_message = self.r.recognize_google(audio, language='ja-JP')
-
-            if self.mode == SPEECH_RECOGNITION_JULIUS:
-                ### for julius
-                while (self.data.find("</RECOGOUT>\n.") == -1):
-                    self.data += str(self.client.recv(1024).decode('shift_jis'))
-                # 単語を抽出
-                self.user_message = ""
-                for word in filter(bool, self.extracted_word.findall(self.data)):
-                    self.user_message += word
-
-            if self.mode == SPEECH_RECOGNITION_VOSK:
-                self.user_message = vosk_streaming.get_message(self.vosk_asr)
-
+            self.user_message = self.speech_model.get_message(self.speech_ret)
             t2 = time.time()
             print(self.user_message)
-            self.response = ELYZA_res.elyza_response(self.user_message)
-    #        self.response = LINE_res.line_response(user_message)
-    #        self.response = rinna_res.rinnna_response(user_message)
-    #        self.response = rinna_gptq_res.rinna_gptq_response(user_message, self.before)
+            self.response = self.llm_model.response(self.user_message)
             t3 = time.time()
             self.before = self.response
             print('talk recognize:', t2 - t1)
@@ -136,7 +113,7 @@ class chat():
         return self.response
 
 if __name__ == '__main__':
-    test = chat(SPEECH_RECOGNITION_VOSK)
+    test = chat(SPEECH_RECOGNITION_VOSK, LLM_ELYZA)
     test.begin()
     while True:
         time.sleep(1)

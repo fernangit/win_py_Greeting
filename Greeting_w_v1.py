@@ -1,21 +1,15 @@
 # -*- coding: utf-8 -*-
-import os, sys, errno
-import signal
 from datetime import datetime
 import time
 import random
 import copy
 
 import cv2 as cv
-from PIL import Image
 import numpy as np
-import pyautogui
 import threading
 
 import pose_detect
-import cv2pil
-import facenet
-import facecv
+import face_recog_model
 import motion
 import talk
 import regist_detected
@@ -28,6 +22,16 @@ import LLM_chat
 SPEECH_RECOGNITION_GOOGLE = 0
 SPEECH_RECOGNITION_JULIUS = 1
 SPEECH_RECOGNITION_VOSK = 2
+
+#face recognition mode
+FACE_RECOGNITION_FACENET = 0
+FACE_RECOGNITION_INSIGHTFACE = 1
+
+#llm mode
+LLM_ELYZA = 0
+LLM_RINNA = 1
+LLM_RINNA_GPTQ = 2
+LLM_LINE = 3
 
 #gesture
 H_NO_GESTURE = 0
@@ -55,6 +59,17 @@ def initialize_devices(device_id):
 
     return cap
 
+#モデル初期化
+def initialize_model(face_recog_mode):
+    #顔認識モデル
+    if face_recog_mode == FACE_RECOGNITION_FACENET:
+        face_model = face_recog_model.facenet_model()
+    elif face_recog_mode == FACE_RECOGNITION_INSIGHTFACE:
+        face_model = face_recog_model.insightface_model()
+    face_model.import_lib()
+
+    return face_model
+           
 #画像サイズ変換
 def scale_to_resolation(img, resolation):
     h, w = img.shape[:2]
@@ -170,35 +185,16 @@ def detect_face(frame):
     return cropped_frame, cropped_face
     
 #顔認証
-def authenticate_face(cropped_frame, greeting):
+def authenticate_face(face_recog_model, cropped_frame, greeting):
     max_sim = 0
     detect_name = ''
 
-    #フレーム除外
-    if exclude_frame(cropped_frame) == False:
-        return greeting, max_sim, detect_name
+    #顔認証
+    max_sim, detect_name, fv = face_recog_model.recognize_face(cropped_frame)
     
-    #OpenCV→Pill変換
-    pill = cv2pil.cv2pil(cropped_frame)
-
-    #顔検出
-#    face = facenet.detect_face(pill, path='out.jpg')
-    face = facenet.detect_face(pill)
-#    face = facecv.detect_face(cropped_frame)
-
-    #顔が見つかれば認証
-#    if (face != None) and (facenet.check_face_size(pill, face, 0.5) == True):
-    if (face != None):
-        #正面顔チェック
-#        front_face = facenet.frontal_face(pill)
-        front_face = facecv.frontal_face(pill)
-
-        if (front_face != False):
-            #挨拶する
-            greeting = True
-            #similarity
-#            max_sim, detect_name, fv = facenet.compare_similarity(face, 'facedb') 
-            max_sim, detect_name, fv = facenet.compare_similarity(face, 'facedb2') 
+    #挨拶する
+    if max_sim != 0.0:
+        greeting = True
 
     #認証した？
     if(detect_name != ''):
@@ -206,8 +202,7 @@ def authenticate_face(cropped_frame, greeting):
         regist_detected.regist_detected(detect_name)
         #類似度80%以上で今回データで差し替え
         if max_sim > 0.8:
-#            vector = 'facedb' + '/' + detect_name
-            vector = 'facedb2' + '/' + detect_name
+            vector = face_recog_model.get_facedb() + '/' + detect_name
             np.save(vector, fv.astype('float32'))
 
         #名前の抽出
@@ -237,6 +232,7 @@ def greet(d, url, max_sim, detect_name):
     #発話内容をリセット
     threading.Thread(target=reset_utterance, args=(url,)).start()
 
+#挨拶メイン関数
 def greeting_main(url, mode = 0):
     #サーバ起動済み＆WebGL起動済みであること
 
@@ -246,6 +242,9 @@ def greeting_main(url, mode = 0):
     #デバイス初期設定
     cap = initialize_devices(0)
     
+    #モデル選択
+    face_model = initialize_model(FACE_RECOGNITION_INSIGHTFACE)
+
     #起動セリフ＆モーション
     opening()
     time.sleep(7)
@@ -254,7 +253,7 @@ def greeting_main(url, mode = 0):
 #    talk.read_sentence()
 
     # #チャット
-    llm_chat = LLM_chat.chat(SPEECH_RECOGNITION_VOSK)
+    llm_chat = LLM_chat.chat(SPEECH_RECOGNITION_VOSK, LLM_ELYZA)
     chatmode = False
     message = old_message = ''
     response = old_response = ''
@@ -292,7 +291,7 @@ def greeting_main(url, mode = 0):
 
             if cropped_face == True:
                 #顔認証
-                greeting, max_sim, detect_name = authenticate_face(cropped_frame, greeting)
+                greeting, max_sim, detect_name = authenticate_face(face_model, cropped_frame, greeting)
 
             #挨拶する
             if greeting == True:
@@ -306,16 +305,16 @@ def greeting_main(url, mode = 0):
             motion.set_goodjob_motion()
             #OK
             #regist_name(detect_name)
-            talk.talk('あざーっす')           
             if chatmode == False:
+                talk.talk('あざーっす！　すこし、おはなししませんか？')           
                 chatmode = True
                 message = ''
                 response = ''
-                #会話開始
-                send_receive_server.send_utterance(url, '', '0', '', '')
+                #会話開始                send_receive_server.send_utterance(url, '', '0', '', '')
                 llm_chat.begin()
                 print("chatmode ", chatmode)
             else:
+                talk.talk('あざーっした！')           
                 chatmode = False
                 #会話終了
                 llm_chat.end()

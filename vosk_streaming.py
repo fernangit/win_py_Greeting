@@ -133,6 +133,9 @@ def init(chunk_size=8000):
 
     return vosk_asr
 
+def kill():
+    pass
+
 def get_message(vosk_asr):
     while(True):
         recog_result = get_asr_result(vosk_asr)

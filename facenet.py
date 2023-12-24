@@ -8,6 +8,8 @@ import glob
 import os
 import time
 import math
+import cv2pil
+import facecv
 #from torch2trt import torch2trt
 
 LEFT_EYE = 0
@@ -111,7 +113,7 @@ def check_face_size(img, face, th):
 def save_feature_vector(inp, outp):
     # フォルダ内のファイルを検索
     print(inp + '/' + '*.jpg')
-    jpg_files = glob.glob(inp + '/' + '*.jpg')
+    jpg_files = glob.glob(inp + '/**/*.jpg', recursive=True)
     for jpg in jpg_files:
         # ファイル名取得
         basename = os.path.splitext(os.path.basename(jpg))[0]
@@ -159,7 +161,7 @@ def compare_similarity(img_cropped, path):
     #特徴ベクトル算出
     start = time.perf_counter()
     in_fv = feature_vector(img_cropped)
-    print('特徴ベクトル算出', time.perf_counter() - start)
+#    print('特徴ベクトル算出', time.perf_counter() - start)
     maxsim = 0.0
     detect = ''
     # フォルダ内のファイルを検索
@@ -197,10 +199,37 @@ def draw_boxes(img, boxes, probs, landmarks):
             draw.rectangle((p - 10).tolist() + (p + 10).tolist, width=10)
     return img_draw
 
+def recognize_face(frame, dbpath):
+    max_sim = 0
+    detect_name = ''
+    fv = []
+
+    #OpenCV→Pill変換
+    pill = cv2pil.cv2pil(frame)
+
+    #顔検出
+    #    face = facenet.detect_face(pill, path='out.jpg')
+    face = detect_face(pill)
+    #    face = detect_face(cropped_frame)
+
+    #顔が見つかれば認証
+    #    if (face != None) and (check_face_size(pill, face, 0.5) == True):
+    if (face != None):
+        #正面顔チェック
+    #        front_face = frontal_face(pill)
+        front_face = facecv.frontal_face(pill)
+
+        if (front_face != False):
+            #similarity
+            max_sim, detect_name, fv = compare_similarity(face, dbpath) 
+
+    return max_sim, detect_name, fv
+
 if __name__ == '__main__':
-    args = sys.argv
-    if 2 <= len(args):
-        print(args[1], args[2])
-        similarity(Image.open(args[1]), Image.open(args[2]))
-    else:
-        print('Arguments are too short')
+    # args = sys.argv
+    # if 2 <= len(args):
+    #     print(args[1], args[2])
+    #     similarity(Image.open(args[1]), Image.open(args[2]))
+    # else:
+    #     print('Arguments are too short')
+    print(similarity(Image.open('images\しゅんすけ\しゅんすけ0.jpg'), Image.open('images\しゅんすけ\しゅんすけ1.jpg')))
