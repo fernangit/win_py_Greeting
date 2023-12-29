@@ -15,6 +15,7 @@ LLM_ELYZA = 0
 LLM_RINNA = 1
 LLM_RINNA_GPTQ = 2
 LLM_LINE = 3
+LLM_SWALLOW = 4
 
 class chat():
     def __init__(self, speech_mode, llm_mode):
@@ -48,12 +49,16 @@ class chat():
         elif llm_mode == LLM_RINNA_GPTQ:
             ### for LINE
             self.llm_model = LLM_model.LINE_model()
+        elif llm_mode == LLM_SWALLOW:
+            ### for LINE
+            self.llm_model = LLM_model.SWALLOW_model()
 
         self.llm_model.import_lib()
 
         self.user_message = ''
         self.response = ''
-        self.before = ''
+        self.mesbefore = ''
+        self.resbefore = ''
         self.data = ''
 
         self.thread = threading.Thread(target=self.chat_sentence_thread)
@@ -65,7 +70,8 @@ class chat():
     def begin(self):
         print("begin")
         self.chat_time = time.time()
-        self.before = ''
+        self.mesbefore = ''
+        self.resbefore = ''
         self.started.set()
 
     def end(self):
@@ -82,16 +88,16 @@ class chat():
         return self.chat_time
 
     def llm_chat(self):
-        self.response = '声が聞き取れませんでしたー'
+        self.response = self.resbefore
         try:
             self.data = ""
             t1 = time.time()
-            self.user_message = self.speech_model.get_message(self.speech_ret)
+            self.user_message = self.mesbefore + "\n" + self.speech_model.get_message(self.speech_ret)
             t2 = time.time()
             print(self.user_message)
             self.response = self.llm_model.response(self.user_message)
             t3 = time.time()
-            self.before = self.response
+            self.resbefore = self.response
             print('talk recognize:', t2 - t1)
             print('response create:', t3 - t2)
         except:

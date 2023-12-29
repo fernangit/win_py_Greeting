@@ -18,27 +18,9 @@ import image_filter
 import hand_gesture
 import LLM_chat
 
-#speach recognition mode
-SPEECH_RECOGNITION_GOOGLE = 0
-SPEECH_RECOGNITION_JULIUS = 1
-SPEECH_RECOGNITION_VOSK = 2
-
 #face recognition mode
 FACE_RECOGNITION_FACENET = 0
 FACE_RECOGNITION_INSIGHTFACE = 1
-
-#llm mode
-LLM_ELYZA = 0
-LLM_RINNA = 1
-LLM_RINNA_GPTQ = 2
-LLM_LINE = 3
-
-#gesture
-H_NO_GESTURE = 0
-H_THUMBS_UP = 1
-H_THUMBS_DOWN = 2
-H_PAPER = 3
-H_PEACE = 4
 
 #時刻初期化
 def initialize_time():
@@ -253,7 +235,7 @@ def greeting_main(url, mode = 0):
 #    talk.read_sentence()
 
     # #チャット
-    llm_chat = LLM_chat.chat(SPEECH_RECOGNITION_VOSK, LLM_ELYZA)
+    llm_chat = LLM_chat.chat(LLM_chat.SPEECH_RECOGNITION_VOSK, LLM_chat.LLM_ELYZA)
     chatmode = False
     message = old_message = ''
     response = old_response = ''
@@ -300,7 +282,7 @@ def greeting_main(url, mode = 0):
         
         #OK gesture
         h_gesture = hand_gesture.detect_hand_gesture(frame)
-        if h_gesture == H_THUMBS_UP:
+        if h_gesture == hand_gesture.H_THUMBS_UP:
             #OK motion
             motion.set_goodjob_motion()
             #OK
@@ -322,12 +304,12 @@ def greeting_main(url, mode = 0):
                 print("chatmode ", chatmode)                
             time.sleep(3)       
         #response
-        elif h_gesture == H_PAPER:
+        elif h_gesture == hand_gesture.H_PAPER:
             #response1 motion
             res_key = motion.set_response1_motion()
             talk.talk(talk.level_to_utterance(motion.response1_dict[res_key]))        
             time.sleep(3)
-        elif h_gesture == H_PEACE:
+        elif h_gesture == hand_gesture.H_PEACE:
             #response2 motion
             res_key = motion.set_response2_motion()
             talk.talk(talk.level_to_utterance(motion.response2_dict[res_key]))        

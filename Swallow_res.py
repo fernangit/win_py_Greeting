@@ -18,7 +18,7 @@ quantization_config = BitsAndBytesConfig(
 #snapshots -> elyza/ELYZA-japanese-Llama-2-7b-fast-instruct
 #キャッシュの場所（例）↓
 #C:\Users\USER\.cache\huggingface\hub\models--elyza--ELYZA-japanese-Llama-2-7b-fast-instruct\snapshots\89de33d1ad568855853196802aeaecd799c6586f
-model_name = "elyza/ELYZA-japanese-Llama-2-7b-fast-instruct"
+model_name = "tokyotech-llm/Swallow-7b-instruct-hf"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -27,8 +27,7 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype="auto", quantization_config=quantization_config)
 #model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype="auto").to(device)
 
-def elyza_response(text, before):
-    text = before + "\n" + text
+def swallow_response(text):
     prompt = "{bos_token}{b_inst} {system}{prompt} {e_inst} ".format(
         bos_token=tokenizer.bos_token,
         b_inst=B_INST,
@@ -55,12 +54,10 @@ def elyza_response(text, before):
     return outs[0]
 
 if __name__ == '__main__':
-    before = ""
     while(True):
         text = input('?(qで終了):')
         if text == 'q' or text == 'Q':
             print('finished')
             break
 
-        elyza_response(text, before)
-        before = before + "\n" + text
+        swallow_response(text)
