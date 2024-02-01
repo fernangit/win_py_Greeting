@@ -20,6 +20,14 @@ Dlib学習済みモデルのダウンロード
 shape_predictor_68_face_landmarks.dat.bz2 -> 解答してdlib_mdlへコピー
 http://www.toshioblog.com/archives/28438095.html
 
+LLM用モデルのダウンロード
+ELYZA-japanese-Llama-2-7b-fast-instruct -> elyza¥にフォルダごとコピー
+https://huggingface.co/elyza/ELYZA-japanese-Llama-2-7b-fast-instruct
+
+顔認識用モデルも必要であれば手動でダウンロードして配置する
+facenet, insightface
+C:\Users\USER\.cache ←　通常、この辺にダウンロードされる
+
 5.wavファイルの設定
 sourceへキーに設定したモーションに対応するwavファイルを設定する。
 sound2.wav
