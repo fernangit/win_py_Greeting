@@ -36,7 +36,7 @@ def announce(now_time, nxt_h, nxt_m, sentence_file):
 
 #挨拶
 def greeting(now_time, name, op):
-    if (now_time.hour > 5) and (now_time.hour < 12):
+    if (now_time.hour > 5) and (now_time.hour < 11):
         #午前
         lst_len = len(utterance.mng_lst)
         rnd = random.randint(0, lst_len + 5)
