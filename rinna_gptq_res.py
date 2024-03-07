@@ -12,7 +12,7 @@ tokenizer = AutoTokenizer.from_pretrained(model_name)
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 model = AutoGPTQForCausalLM.from_quantized(model_name, use_safetensors=True)
 
-def rinna_response(text, before):
+def response(text, before):
     context = [
         {"speaker": "設定", "text": DEFAULT_SYSTEM_PROMPT},
         {"speaker": "ユーザー", "text": text},
@@ -45,4 +45,4 @@ if __name__ == '__main__':
             print('finished')
             break
 
-        rinna_response(text, before)
+        response(text, before)

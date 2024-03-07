@@ -17,35 +17,42 @@ class ELYZA_model(llm):
         self.model = importlib.import_module('ELYZA_res')
 
     def response(self, text, before=""):
-        return self.model.elyza_response(text, before)
+        return self.model.response(text, before)
 
-class RINNA_model(llm):
+class RINNA_youri_model(llm):
     def import_lib(self):
-        self.model = importlib.import_module('rinna_res')
+        self.model = importlib.import_module('rinna_youri_res')
 
     def response(self, text, before=""):
-        return self.model.rinna_response(text)
+        return self.model.response(text)
+
+class RINNA_nekomata_model(llm):
+    def import_lib(self):
+        self.model = importlib.import_module('rinna_nekomata_res')
+
+    def response(self, text, before=""):
+        return self.model.response(text)
 
 class RINNA_GPTQ_model(llm):
     def import_lib(self):
         self.model = importlib.import_module('rinna_gptq_res')
 
     def response(self, text, before):
-        return self.model.rinna_response(text, before)
+        return self.model.response(text, before)
 
 class LINE_model(llm):
     def import_lib(self):
         self.model = importlib.import_module('LINE_res')
 
     def response(self, text, before=""):
-        return self.model.line_response(text)
+        return self.model.response(text)
 
 class SWALLOW_model(llm):
     def import_lib(self):
         self.model = importlib.import_module('Swallow_res')
 
     def response(self, text, before=""):
-        return self.model.line_response(text)
+        return self.model.response(text)
     
 if __name__ == '__main__':
     llm_model = ELYZA_model()

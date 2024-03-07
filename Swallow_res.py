@@ -27,7 +27,7 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype="auto", quantization_config=quantization_config)
 #model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype="auto").to(device)
 
-def swallow_response(text):
+def response(text):
     prompt = "{bos_token}{b_inst} {system}{prompt} {e_inst} ".format(
         bos_token=tokenizer.bos_token,
         b_inst=B_INST,
@@ -60,4 +60,4 @@ if __name__ == '__main__':
             print('finished')
             break
 
-        swallow_response(text)
+        response(text)

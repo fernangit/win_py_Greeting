@@ -12,7 +12,7 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 model = AutoModelForCausalLM.from_pretrained(model_name).to(device)
 generator = pipeline("text-generation", model=model, tokenizer=tokenizer, device=device)
 
-def line_response(text):
+def response(text):
     prompt = DEFAULT_SYSTEM_PROMPT + text
     output = generator(
         prompt,
@@ -34,4 +34,4 @@ if __name__ == '__main__':
             print('finished')
             break
 
-        line_response(text)
+        response(text)

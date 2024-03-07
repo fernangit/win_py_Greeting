@@ -12,10 +12,11 @@ SPEECH_RECOGNITION_VOSK = 2
 
 #llm mode
 LLM_ELYZA = 0
-LLM_RINNA = 1
-LLM_RINNA_GPTQ = 2
-LLM_LINE = 3
-LLM_SWALLOW = 4
+LLM_youri_RINNA = 1
+LLM_nekomata_RINNA = 2
+LLM_RINNA_GPTQ = 3
+LLM_LINE = 4
+LLM_SWALLOW = 5
 
 class chat():
     def __init__(self, speech_mode, llm_mode):
@@ -40,9 +41,12 @@ class chat():
         if llm_mode == LLM_ELYZA:
             ### for ELYZA
             self.llm_model = LLM_model.ELYZA_model()
-        elif llm_mode == LLM_RINNA:
-            ### for RINNA
-            self.llm_model = LLM_model.RINNA_model()
+        elif llm_mode == LLM_youri_RINNA:
+            ### for youri RINNA
+            self.llm_model = LLM_model.RINNA_youri_model()
+        elif llm_mode == LLM_nekomata_RINNA:
+            ### for nekomata RINNA
+            self.llm_model = LLM_model.RINNA_nekomata_model()
         elif llm_mode == LLM_RINNA_GPTQ:
             ### for RINNA GPTQ
             self.llm_model = LLM_model.RINNA_GPTQ_model()

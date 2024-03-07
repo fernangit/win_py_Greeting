@@ -49,29 +49,31 @@ def set_response2_motion():
 
 #所定時刻の所定モーション呼び出し
 def set_default_motion(now_time):
-    if now_time.hour == 8 and now_time.minute == 26 and now_time.second == 21:
-        #8:26 ラジオ体操
-        if os.path.isfile(sound_list[0]) == True:
-            #BGM再生
-            thread = threading.Thread(target=playSound, args=(sound_list[0],))
-            thread.start()
-            #モーションズレ補正
-            time.sleep(0.2)
-        pyautogui.hotkey('1')
-    if now_time.hour == 12 and now_time.minute == 30 and now_time.second == 0:
-        #12:30 昼休み
-        pyautogui.hotkey('b')
-        winsound.PlaySound('昼休み.wav',  winsound.SND_FILENAME)
-    if now_time.hour == 17 and now_time.minute == 00 and now_time.second == 0:
-        #17:00 ダンスの時間
-        motion = random.randint(1, len(dance_list) - 1)
-        if os.path.isfile(sound_list[motion]) == True:
-            #BGM再生
-            thread = threading.Thread(target=playSound, args=(sound_list[motion],))
-            thread.start()
-            #モーションズレ補正
-            time.sleep(0.2)
-        pyautogui.hotkey(dance_list[motion])
+    global thread
+    if thread.is_alive() == False:
+        if now_time.hour == 8 and now_time.minute == 26 and now_time.second == 21:
+            #8:26 ラジオ体操
+            if os.path.isfile(sound_list[0]) == True:
+                #BGM再生
+                thread = threading.Thread(target=playSound, args=(sound_list[0],))
+                thread.start()
+                #モーションズレ補正
+                time.sleep(0.2)
+            pyautogui.hotkey('1')
+        if now_time.hour == 12 and now_time.minute == 30 and now_time.second == 0:
+            #12:30 昼休み
+            pyautogui.hotkey('b')
+            winsound.PlaySound('昼休み.wav',  winsound.SND_FILENAME)
+        if now_time.hour == 17 and now_time.minute == 00 and now_time.second == 0:
+            #17:00 ダンスの時間
+            motion = random.randint(1, len(dance_list) - 1)
+            if os.path.isfile(sound_list[motion]) == True:
+                #BGM再生
+                thread = threading.Thread(target=playSound, args=(sound_list[motion],))
+                thread.start()
+                #モーションズレ補正
+                time.sleep(0.2)
+            pyautogui.hotkey(dance_list[motion])
 
 #レベル対応モーション呼び出し
 def set_level_motion(level):
@@ -92,6 +94,9 @@ def get_motion_num():
 
 def playSound(soundPath):
     winsound.PlaySound(soundPath,  winsound.SND_FILENAME)
+
+#スレッドの二重起動防止用
+thread = threading.Thread(target=playSound, args=(sound_list[0],))
 
 if __name__ == '__main__':
     args = sys.argv
