@@ -88,6 +88,11 @@ def set_goodjob_motion():
     pyautogui.hotkey(motion_list[16])
 #    print("pyautogui.hotkey(motion_list[16])")
 
+#バイバイモーション呼び出し
+def set_byebye_motion():
+    pyautogui.hotkey(motion_list[2])
+#    print("pyautogui.hotkey(motion_list[2])")
+
 #モーション数
 def get_motion_num():
     return len(motion_list)

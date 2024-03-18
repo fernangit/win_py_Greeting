@@ -16,7 +16,7 @@ import regist_detected
 import send_receive_server
 import image_filter
 import hand_gesture
-#import LLM_chat
+import LLM_chat
 import CLS_chat
 
 #face recognition mode
@@ -235,11 +235,11 @@ def greeting_main(url, mode = 0):
     #読み上げ開始
 #    talk.read_sentence()
     
-    # # チャット
-    # llm_chat = LLM_chat.chat(LLM_chat.SPEECH_RECOGNITION_VOSK, LLM_chat.LLM_ELYZA)
+    # チャット
+    llm_chat = LLM_chat.chat(LLM_chat.SPEECH_RECOGNITION_VOSK, LLM_chat.LLM_ELYZA)
     chatmode = False
-    # message = old_message = ''
-    # response = old_response = ''
+    message = old_message = ''
+    response = old_response = ''
     
     # 意図抽出
     cls_chat = CLS_chat.clsChat(CLS_chat.SPEECH_RECOGNITION_VOSK)
@@ -301,15 +301,16 @@ def greeting_main(url, mode = 0):
                     response = ''
                     #会話開始
                     send_receive_server.send_utterance(url, '', '0', '', '')
-                    # llm_chat.begin()
+                    llm_chat.begin()
                     print("chatmode ", chatmode)
 
         #10秒無言だと会話モード終了
         if chatmode == True and ((time.time() - cls_chat.get_chat_time()) > 10):
+            motion.set_byebye_motion()
             talk.talk('ばいばーい')
             chatmode = False
             #会話終了
-            # llm_chat.end()
+            llm_chat.end()
             send_receive_server.send_utterance(url, '', '0', '', '')
             print("chatmode ", chatmode)    
 
@@ -332,25 +333,25 @@ def greeting_main(url, mode = 0):
             talk.talk(talk.level_to_utterance(motion.response2_dict[res_key]))        
             time.sleep(3)
 
-        # #1分間会話がなければ挨拶モードに戻る
-        # if (chatmode == True) and ((time.time() - llm_chat.get_chat_time()) > 60):
-        #     chatmode = False
-        #     llm_chat.end()
-        #     send_receive_server.send_utterance(url, '', '0', '', '')
-        #     print("chatmode over ", chatmode, (time.time() - llm_chat.get_chat_time()))
+        #1分間会話がなければ挨拶モードに戻る
+        if (chatmode == True) and ((time.time() - llm_chat.get_chat_time()) > 60):
+            chatmode = False
+            llm_chat.end()
+            send_receive_server.send_utterance(url, '', '0', '', '')
+            print("chatmode over ", chatmode, (time.time() - llm_chat.get_chat_time()))
 
-        # #会話取得
-        # if chatmode == True:
-        #     message = llm_chat.get_user_message()
-        #     if message != old_message:
-        #         old_message = message
-        #         response = ''
-        #         send_receive_server.send_utterance(url, '', '0', message, response)
+        #会話取得
+        if chatmode == True:
+            message = llm_chat.get_user_message()
+            if message != old_message:
+                old_message = message
+                response = ''
+                send_receive_server.send_utterance(url, '', '0', message, response)
 
-        #     response = llm_chat.get_response()
-        #     if response != old_response:
-        #         old_response = response
-        #         send_receive_server.send_utterance(url, '', '0', message, response)
+            response = llm_chat.get_response()
+            if response != old_response:
+                old_response = response
+                send_receive_server.send_utterance(url, '', '0', message, response)
             
         #debug
         cv.imshow('Image', frame)
