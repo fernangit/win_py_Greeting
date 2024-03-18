@@ -1,0 +1,61 @@
+日本語日常対話コーパス
+japanese-daily-dialogue-main
+https://github.com/jqk09a/japanese-daily-dialogue/blob/main/README.md
+
+Huggingface Transformers 入門 (12) -日本語のテキスト分類の学習
+https://note.com/npaka/n/n6df2be2a91c5
+
+①JSON読み込み
+read_json.py
+→corpusCSVファイル作成
+
+②マージ
+merge_csv.py
+→list.csv作成
+⇒必要ならデータ追加
+
+③学習用データ作成
+create_dataset.py
+→train.csv, val.csv
+
+④学習
+Hagging faceのTransformersのテキスト分類を使う
+# Huggingface Transformersのインストール
+!git clone https://github.com/huggingface/transformers
+%cd transformers
+!pip install .
+
+# 日本語対応パッケージのインストール
+!pip install fugashi[unidic-lite]
+!pip install ipadic
+
+# テキスト分類の学習1
+python run_glue.py --model_name_or_path=cl-tohoku/bert-base-japanese-whole-word-masking --do_train --do_eval --max_seq_length=128 --per_device_train_batch_size=32 --use_fast_tokenizer=False --learning_rate=2e-5 --num_train_epochs=50 --output_dir=text-classification_ja/ --overwrite_output_dir --train_file=japanese-daily-dialogue-main/data/train.csv --validation_file=japanese-daily-dialogue-main/data/val.csv
+
+# テキスト分類の学習2
+python run_glue.py --model_name_or_path=text-classification_ja --do_train --do_eval --max_seq_length=128 --per_device_train_batch_size=32 --use_fast_tokenizer=False --learning_rate=2e-5 --num_train_epochs=50 --output_dir=text-classification_ja/ --overwrite_output_dir --train_file=japanese-daily-dialogue-main/data/train.csv --validation_file=japanese-daily-dialogue-main/data/val.csv
+
+⑤分類
+text_classification.py
+
+⑥固有表現抽出
+
+⑦Mecabでオリジナル辞書を作成する
+https://qiita.com/nnahito/items/16c8e214d71fbc23ed8e
+認識しない固有名詞はオリジナル辞書を作成
+
+リスト作成
+登録したい名詞,ID,ID,重み,品詞,品詞の説明,*,*,*,*,登録したい名詞,カタカナ表示,カタカナ表記
+original.csv
+つなき,1285,1285,5543,名詞,固有名詞,人名,姓,*,*,ツナキ,ツナキ,ツナキ
+本廣,1285,1285,5543,名詞,固有名詞,人名,姓,*,*,モトヒロ,モトヒロ,モトヒロ
+
+バイナリ化
+/usr/local/libexec/mecab/mecab-dict-index -d /usr/local/lib/mecab/dic/ipadic -u original.dic -f utf-8 -t utf-8 original.csv
+
+オリジナル辞書の追加
+\\github\transformers\venv\Lib\site-packages\unidic\dicdir
+にoriginal.dicをコピー
+dicrcファイルに
+userdic = c:\github\transformers\venv\Lib\site-packages\unidic\dicdir\original.dic
+を追記

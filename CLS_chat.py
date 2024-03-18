@@ -2,24 +2,16 @@ import threading
 import talk
 import time
 from datetime import datetime, timedelta
-import LLM_model
 import speech_recog_model
+import text_classification
 
 #speech mode
 SPEECH_RECOGNITION_GOOGLE = 0
 SPEECH_RECOGNITION_JULIUS = 1
 SPEECH_RECOGNITION_VOSK = 2
 
-#llm mode
-LLM_ELYZA = 0
-LLM_youri_RINNA = 1
-LLM_nekomata_RINNA = 2
-LLM_RINNA_GPTQ = 3
-LLM_LINE = 4
-LLM_SWALLOW = 5
-
-class chat():          
-    def __init__(self, speech_mode, llm_mode):
+class clsChat():          
+    def __init__(self, speech_mode):
         self.started = threading.Event()
         self.alive = True
         self.chat_time = time.time()
@@ -28,15 +20,9 @@ class chat():
         self.speech_model.import_lib()
         self.speech_ret = self.speech_model.init()
 
-        #LLM model
-        self.select_llm_model(llm_mode)
-        self.llm_model.import_lib()
-
+        self.user_intent = ''
+        self.val = 0.0
         self.user_message = ''
-        self.response = ''
-        self.mesbefore = ''
-        self.resbefore = ''
-        self.data = ''
 
         self.thread = threading.Thread(target=self.chat_sentence_thread)
         self.thread.start()
@@ -53,35 +39,12 @@ class chat():
             ### for vosk
             self.speech_model = speech_recog_model.VOSK_model()
 
-    def select_llm_model(self, llm_mode):
-        #LLM model
-        if llm_mode == LLM_ELYZA:
-            ### for ELYZA
-            self.llm_model = LLM_model.ELYZA_model()
-        elif llm_mode == LLM_youri_RINNA:
-            ### for youri RINNA
-            self.llm_model = LLM_model.RINNA_youri_model()
-        elif llm_mode == LLM_nekomata_RINNA:
-            ### for nekomata RINNA
-            self.llm_model = LLM_model.RINNA_nekomata_model()
-        elif llm_mode == LLM_RINNA_GPTQ:
-            ### for RINNA GPTQ
-            self.llm_model = LLM_model.RINNA_GPTQ_model()
-        elif llm_mode == LLM_RINNA_GPTQ:
-            ### for LINE
-            self.llm_model = LLM_model.LINE_model()
-        elif llm_mode == LLM_SWALLOW:
-            ### for LINE
-            self.llm_model = LLM_model.SWALLOW_model()
-
     def __del__(self):
         self.kill()
 
     def begin(self):
         print("begin")
         self.chat_time = time.time()
-        self.mesbefore = ''
-        self.resbefore = ''
         self.started.set()
 
     def end(self):
@@ -92,44 +55,40 @@ class chat():
         self.started.set()
         self.alive = False
         self.thread.join()
-        self.speach_model.kill()
+        self.speech_model.kill()
 
     def get_chat_time(self):
         return self.chat_time
 
-    def llm_chat(self):
-        self.response = self.resbefore
+    def cls_chat(self):
         try:
-            self.data = ""
             t1 = time.time()
-            self.user_message = self.mesbefore + "\n" + self.speech_model.get_message(self.speech_ret)
+            self.user_message = "\n" + self.speech_model.get_message(self.speech_ret)
             t2 = time.time()
             print(self.user_message)
-            self.response = self.llm_model.response(self.user_message)
+            label, val = text_classification.get_label(self.user_message)
             t3 = time.time()
-            self.resbefore = self.response
+            print(label, val)
             print('talk recognize:', t2 - t1)
-            print('response create:', t3 - t2)
+            print('classified:', t3 - t2)
         except:
-            self.response = 'すみません、もういちどおねがいしますー'
+            label = ''
+            val = 0.0
 
-        return self.response
+        return label, val
 
     def chat_sentence_thread(self):
         self.started.wait()
         while self.alive:
-            talk.read_text(self.llm_chat())
+            self.user_intent, self.val = self.cls_chat()
             self.started.wait()
             self.chat_time = time.time()
 
-    def get_user_message(self):
-        return self.user_message
-
-    def get_response(self):
-        return self.response
+    def get_user_intent(self):
+        return self.user_intent, self.val, self.user_message
 
 if __name__ == '__main__':
-    test = chat(SPEECH_RECOGNITION_VOSK, LLM_ELYZA)
+    test = clsChat(SPEECH_RECOGNITION_VOSK)
     test.begin()
     while True:
         time.sleep(1)

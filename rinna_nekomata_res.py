@@ -8,7 +8,7 @@ tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 #CPUだとメモリオーバーなので
 #device = "cpu"
-model = AutoModelForCausalLM.from__pretrained(model_name, device_map="auto", trust_remote_code=True)
+model = AutoModelForCausalLM.from_pretrained(model_name, device_map="auto", trust_remote_code=True)
 
 instruction = "あなたは20歳の受付の女性です。名前はまうです。優しく、わかりやすく、丁寧に解答してください。"
 

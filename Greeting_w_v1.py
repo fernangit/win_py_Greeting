@@ -16,7 +16,8 @@ import regist_detected
 import send_receive_server
 import image_filter
 import hand_gesture
-import LLM_chat
+#import LLM_chat
+import CLS_chat
 
 #face recognition mode
 FACE_RECOGNITION_FACENET = 0
@@ -233,13 +234,18 @@ def greeting_main(url, mode = 0):
     
     #読み上げ開始
 #    talk.read_sentence()
-
-    # #チャット
-    llm_chat = LLM_chat.chat(LLM_chat.SPEECH_RECOGNITION_VOSK, LLM_chat.LLM_ELYZA)
-    chatmode = False
-    message = old_message = ''
-    response = old_response = ''
     
+    # # チャット
+    # llm_chat = LLM_chat.chat(LLM_chat.SPEECH_RECOGNITION_VOSK, LLM_chat.LLM_ELYZA)
+    chatmode = False
+    # message = old_message = ''
+    # response = old_response = ''
+    
+    # 意図抽出
+    cls_chat = CLS_chat.clsChat(CLS_chat.SPEECH_RECOGNITION_VOSK)
+    cls_chat.begin()
+    text = old_text = ''
+
     while True:
         cv.waitKey(1)
         greeting = False
@@ -280,28 +286,39 @@ def greeting_main(url, mode = 0):
                 greet(d, url, max_sim, detect_name)
                 t_st = time.time()
         
+        #classification
+        old_text = text
+        intent, val, text = cls_chat.get_user_intent()
+        #呼びかけ
+        if val > 6.0 and old_text != text:
+            print(old_text, text)
+            if intent == 'MAU':
+                #呼びかけで会話モード開始
+                if chatmode == False:
+                    talk.talk('はいーなんですかー')           
+                    chatmode = True
+                    message = ''
+                    response = ''
+                    #会話開始
+                    send_receive_server.send_utterance(url, '', '0', '', '')
+                    # llm_chat.begin()
+                    print("chatmode ", chatmode)
+
+        #10秒無言だと会話モード終了
+        if chatmode == True and ((time.time() - cls_chat.get_chat_time()) > 10):
+            talk.talk('ばいばーい')
+            chatmode = False
+            #会話終了
+            # llm_chat.end()
+            send_receive_server.send_utterance(url, '', '0', '', '')
+            print("chatmode ", chatmode)    
+
         #OK gesture
         h_gesture = hand_gesture.detect_hand_gesture(frame)
         if h_gesture == hand_gesture.H_THUMBS_UP:
             #OK motion
             motion.set_goodjob_motion()
-            #OK
-            #regist_name(detect_name)
-            if chatmode == False:
-                talk.talk('あざーっす！　すこし、おはなししませんか？')           
-                chatmode = True
-                message = ''
-                response = ''
-                #会話開始                send_receive_server.send_utterance(url, '', '0', '', '')
-                llm_chat.begin()
-                print("chatmode ", chatmode)
-            else:
-                talk.talk('あざーっした！')           
-                chatmode = False
-                #会話終了
-                llm_chat.end()
-                send_receive_server.send_utterance(url, '', '0', '', '')
-                print("chatmode ", chatmode)                
+            talk.talk('グッッジョーーブ')   
             time.sleep(3)       
         #response
         elif h_gesture == hand_gesture.H_PAPER:
@@ -315,25 +332,25 @@ def greeting_main(url, mode = 0):
             talk.talk(talk.level_to_utterance(motion.response2_dict[res_key]))        
             time.sleep(3)
 
-        #1分間会話がなければ挨拶モードに戻る
-        if (chatmode == True) and ((time.time() - llm_chat.get_chat_time()) > 60):
-            chatmode = False
-            llm_chat.end()
-            send_receive_server.send_utterance(url, '', '0', '', '')
-            print("chatmode over ", chatmode, (time.time() - llm_chat.get_chat_time()))
+        # #1分間会話がなければ挨拶モードに戻る
+        # if (chatmode == True) and ((time.time() - llm_chat.get_chat_time()) > 60):
+        #     chatmode = False
+        #     llm_chat.end()
+        #     send_receive_server.send_utterance(url, '', '0', '', '')
+        #     print("chatmode over ", chatmode, (time.time() - llm_chat.get_chat_time()))
 
-        #会話取得
-        if chatmode == True:
-            message = llm_chat.get_user_message()
-            if message != old_message:
-                old_message = message
-                response = ''
-                send_receive_server.send_utterance(url, '', '0', message, response)
+        # #会話取得
+        # if chatmode == True:
+        #     message = llm_chat.get_user_message()
+        #     if message != old_message:
+        #         old_message = message
+        #         response = ''
+        #         send_receive_server.send_utterance(url, '', '0', message, response)
 
-            response = llm_chat.get_response()
-            if response != old_response:
-                old_response = response
-                send_receive_server.send_utterance(url, '', '0', message, response)
+        #     response = llm_chat.get_response()
+        #     if response != old_response:
+        #         old_response = response
+        #         send_receive_server.send_utterance(url, '', '0', message, response)
             
         #debug
         cv.imshow('Image', frame)
