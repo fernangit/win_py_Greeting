@@ -78,7 +78,7 @@ class chat():
         self.kill()
 
     def begin(self):
-        print("begin")
+        print("llm begin")
         self.chat_time = time.time()
         self.mesbefore = ''
         self.resbefore = ''
@@ -86,7 +86,7 @@ class chat():
 
     def end(self):
         self.started.clear()
-        print("\nend")
+        print("llm end")
 
     def kill(self):
         self.started.set()

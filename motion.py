@@ -60,6 +60,9 @@ def set_default_motion(now_time):
                 #モーションズレ補正
                 time.sleep(0.2)
             pyautogui.hotkey('1')
+            if os.path.isfile(sound_list[0]) == True:
+                #音声終了待ち
+                thread.join()
         if now_time.hour == 12 and now_time.minute == 30 and now_time.second == 0:
             #12:30 昼休み
             pyautogui.hotkey('b')
@@ -74,6 +77,9 @@ def set_default_motion(now_time):
                 #モーションズレ補正
                 time.sleep(0.2)
             pyautogui.hotkey(dance_list[motion])
+            if os.path.isfile(sound_list[motion]) == True:
+                #音声終了待ち
+                thread.join()
 
 #レベル対応モーション呼び出し
 def set_level_motion(level):

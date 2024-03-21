@@ -43,13 +43,13 @@ class clsChat():
         self.kill()
 
     def begin(self):
-        print("begin")
+        print("cls begin")
         self.chat_time = time.time()
         self.started.set()
 
     def end(self):
         self.started.clear()
-        print("\nend")
+        print("cls end")
 
     def kill(self):
         self.started.set()
@@ -63,9 +63,9 @@ class clsChat():
     def cls_chat(self):
         try:
             t1 = time.time()
-            self.user_message = "\n" + self.speech_model.get_message(self.speech_ret)
+            self.user_message = self.speech_model.get_message(self.speech_ret)
             t2 = time.time()
-            print(self.user_message)
+            print('user_message=', self.user_message)
             label, val = text_classification.get_label(self.user_message)
             t3 = time.time()
             print(label, val)
