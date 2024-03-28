@@ -2,7 +2,7 @@ import torch
 from transformers import BertJapaneseTokenizer, AutoModelForSequenceClassification
 
 # ラベル
-labels = ['Dailylife', 'Schoollife', 'Travel', 'Health', 'Entertainment', 'ReserveMeetingroom', 'Call', 'Praise', 'Encouragement', 'SetPlan', 'MAU']
+labels = ['Dailylife', 'Schoollife', 'Travel', 'Health', 'Entertainment', 'ReserveMeetingroom', 'Call', 'Praise', 'Encouragement', 'SetPlan', 'MAU', 'Greeting', 'CallOut']
 
 # モデルとトークナイザーの準備
 model = AutoModelForSequenceClassification.from_pretrained('text-classification_ja/')    

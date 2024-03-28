@@ -1,0 +1,6 @@
+■モデルの追加が必要
+・Insightface
+・cl-ohoku
+・elyza
+・pose
+text-classification
