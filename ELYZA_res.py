@@ -43,7 +43,8 @@ def response(text, before):
 
         output_ids = model.generate(
             token_ids.to(model.device),
-            max_new_tokens=256,
+#            max_new_tokens=256,
+            max_new_tokens=32,
             pad_token_id=tokenizer.pad_token_id,
             eos_token_id=tokenizer.eos_token_id,
         )

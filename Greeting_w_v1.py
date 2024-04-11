@@ -264,8 +264,8 @@ def greeting_main(url, mode = 0):
         #入力フレーム補正
         frame = correct_frame(frame)
 
-        #前回から5秒以上経過？
-        if ((time.time() - t_st) > 5) and (chatmode == False):
+        #前回から8秒以上経過？
+        if ((time.time() - t_st) > 8) and (chatmode == False):
             #元画像を保存
             org_frame = copy.copy(frame)
 
@@ -296,11 +296,11 @@ def greeting_main(url, mode = 0):
                 val = 0
 
         #呼びかけ
-        if val > 6.0 and chatmode == False:
+        if val > 6.5 and chatmode == False:
             if intent == 'MAU' or intent == 'Greeting' or intent == 'CallOut':
                 #呼びかけで会話モード開始
                 print('＊＊＊会話モード開始＊＊＊')           
-                talk.read_text('はいーなんですかー')           
+                talk.read_text('はいーなんでしょうかー')           
                 chatmode = True
                 message = ''
                 response = ''
@@ -318,6 +318,9 @@ def greeting_main(url, mode = 0):
             motion.set_byebye_motion()
             talk.talk('ばいばーい')
             chatmode = False
+            intent = ''
+            val = 0
+            cls_chat.reset_user_intent()
             #会話終了
             cls_chat.begin()
             llm_chat.end()

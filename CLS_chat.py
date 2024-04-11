@@ -87,6 +87,11 @@ class clsChat():
     def get_user_intent(self):
         return self.user_intent, self.val, self.user_message
 
+    def reset_user_intent(self):
+        self.user_intent = ''
+        self.val = 0
+        self.user_message = ''
+
 if __name__ == '__main__':
     test = clsChat(SPEECH_RECOGNITION_VOSK)
     test.begin()
