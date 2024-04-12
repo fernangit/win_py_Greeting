@@ -1,6 +1,9 @@
 ■モデルの追加が必要
-・Insightface
-・cl-ohoku
+・insightface
+・facenet
 ・elyza
 ・pose
-text-classification
+・mediapipe
+・cl-tohoku
+・text-classification
+・vosk
