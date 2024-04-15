@@ -107,11 +107,11 @@ class chat():
             print(self.user_message)
             self.response = self.llm_model.response(self.user_message)
             t3 = time.time()
-            if len(self.resbefore >= 10 and self.resbefore in self.response:
+            if len(self.resbefore) >= 10 and self.resbefore in self.response:
                 # レスポンスに前回と同一文章（10文字以上）を含む場合はリセット
                 raise Exception
             # 3センテンスのみ前回文章として読み込ませる
-            self.resbefore = '。'.join(self.response.split('。')[:3]
+            self.resbefore = '。'.join(self.response.split('。')[:3])
             print('resbefore:', self.resbefore)
             print('talk recognize:', t2 - t1)
             print('response create:', t3 - t2)

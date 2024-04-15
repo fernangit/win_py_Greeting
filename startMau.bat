@@ -19,6 +19,6 @@ rem start "" D:\work\win_py_Greeting\venv\Scripts\python.exe D:\work\win_py_Gree
 rem timeout /t 1 > nul
 start "" D:\work\win_py_Greeting\venv\Scripts\python.exe D:\work\win_py_Greeting\Greeting_w_v1.py
 timeout /t 10 > nul
-.\activate.vbs msedge.exe
+D:\work\win_py_Greeting\activate.vbs msedge.exe
 timeout /t 5 > nul
 D:\work\win_py_Greeting\venv\Scripts\python.exe D:\work\win_py_Greeting\browserMaximize.py
