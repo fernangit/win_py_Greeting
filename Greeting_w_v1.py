@@ -308,13 +308,13 @@ def greeting_main(url, mode = 0):
                 #会話開始
                 send_receive_server.send_utterance(url, '', '0', '', '')
                 cls_chat.end()
-                llm_chat.begin()
+                LLM_chat.begin()
                 print("chatmode ", chatmode)
             
             if intent == 'Terminate':
                 #終了
                 talk.read_text('あいさつユニット終了します。よろしいですか？')
-                intent, val = cls_chat()
+                intent, val = cls_chat.cls_chat()
                 if intent == 'Positive':
                     break
                 else:
@@ -322,7 +322,7 @@ def greeting_main(url, mode = 0):
 
         #30秒無言だと会話モード終了
 #        if chatmode == True and ((time.time() - cls_chat.get_chat_time()) > 30): #for debug
-        if chatmode == True and ((time.time() - llm_chat.get_chat_time()) > 30):
+        if chatmode == True and ((time.time() - LLM_chat.get_chat_time()) > 30):
             print('＊＊＊会話モード終了＊＊＊')           
             motion.set_byebye_motion()
             talk.talk('ばいばーい')
@@ -332,7 +332,7 @@ def greeting_main(url, mode = 0):
             cls_chat.reset_user_intent()
             #会話終了
             cls_chat.begin()
-            llm_chat.end()
+            LLM_chat.end()
             send_receive_server.send_utterance(url, '', '0', '', '')
             print("chatmode ", chatmode)    
 
@@ -357,13 +357,13 @@ def greeting_main(url, mode = 0):
 
         #会話取得
         if chatmode == True:
-            message = llm_chat.get_user_message()
+            message = LLM_chat.get_user_message()
             if message != old_message:
                 old_message = message
                 response = ''
                 send_receive_server.send_utterance(url, '', '0', message, response)
 
-            response = llm_chat.get_response()
+            response = LLM_chat.get_response()
             if response != old_response:
                 old_response = response
                 send_receive_server.send_utterance(url, '', '0', message, response)
