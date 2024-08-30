@@ -16,8 +16,8 @@ DEFAULT_SYSTEM_PROMPT4 = '目の前に見えている景色も参考に回答し
 quantization_config = BitsAndBytesConfig(
     load_in_4bit=True,
     bnb_4bit_use_double_quant=True,
-    bnb_4bit_quart_Lype = 'nf4',
-    bnb_4bit_compute_diype= torch.bfloat16,    
+    bnb_4bit_quant_type = 'nf4',
+    bnb_4bit_compute_dtype= torch.bfloat16,    
 )
 
 class ELYZA:
