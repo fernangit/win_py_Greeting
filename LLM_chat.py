@@ -18,6 +18,9 @@ LLM_RINNA_GPTQ = 3
 LLM_LINE = 4
 LLM_SWALLOW = 5
 
+#debugmode
+DEBUG = 1
+
 class chat():          
     def __init__(self, speech_mode, llm_mode):
         self.started = threading.Event()
@@ -78,7 +81,7 @@ class chat():
         self.kill()
 
     def begin(self):
-        print("llm begin")
+        print('llm begin')
         self.chat_time = time.time()
         self.mesbefore = ''
         self.resbefore = ''
@@ -86,7 +89,7 @@ class chat():
 
     def end(self):
         self.started.clear()
-        print("llm end")
+        print('llm end')
 
     def kill(self):
         self.started.set()
@@ -100,12 +103,16 @@ class chat():
     def llm_chat(self):
         self.response = self.resbefore
         try:
-            self.data = ""
+            self.data = ''
             t1 = time.time()
-            self.user_message = self.mesbefore + "\n" + self.speech_model.get_message(self.speech_ret)
+            self.user_message = self.mesbefore + '\n' + self.speech_model.get_message(self.speech_ret)
             t2 = time.time()
             print(self.user_message)
-            self.response = self.llm_model.response(self.user_message)
+            self.filler = threading.Thread(target=self.chat_filler_thread)
+            self.filler.start()
+            self.filler_alive = True
+            self.response = self.llm_model.response(self.user_message, self.resbefore)
+            self.filler_alive = False
             t3 = time.time()
             if len(self.resbefore) >= 10 and self.resbefore in self.response:
                 # レスポンスに前回と同一文章（10文字以上）を含む場合はリセット
@@ -124,9 +131,15 @@ class chat():
     def chat_sentence_thread(self):
         self.started.wait()
         while self.alive:
-            talk.read_text(self.llm_chat())
+            talk.read_text(self.llm_chat(), DEBUG)
             self.started.wait()
             self.chat_time = time.time()
+
+    def chat_filler_thread(self):
+        time.sleep(6)
+        while(self.filler_alive):
+            talk.filler()
+            time.sleep(3)
 
     def get_user_message(self):
         return self.user_message
@@ -138,9 +151,13 @@ if __name__ == '__main__':
     test = chat(SPEECH_RECOGNITION_VOSK, LLM_ELYZA)
     test.begin()
     while True:
-        time.sleep(1)
-        if(time.time() - test.get_chat_time()) > 60:
-            test.end()
+        # time.sleep(1)
+        # if(time.time() - test.get_chat_time()) > 60:
+        #     test.end()
+        #     break
+        text = input('?(qで終了):')
+        if text == 'q' or text == 'Q':
+            print('finished')
             break
-
+        
     test.kill()

@@ -28,6 +28,11 @@ def monologue(now_time, nxt_h, nxt_m):
 
     return nxt_h, nxt_m
 
+#フィラー
+def filler():
+    fill = random.randint(0, len_utterance_filler_lst() - 1)
+    talk(utterance.filler_lst[fill])
+
 #定時アナウンス
 def announce(now_time, nxt_h, nxt_m, sentence_file):
     if now_time.hour == nxt_h and now_time.minute == nxt_m:
@@ -77,13 +82,14 @@ def read_sentence_file(sentence_file):
         with open(sentence_file, encoding="utf-8") as f:
             read_text(f.read())
 
-def read_text(text):
+def read_text(text, debugmode = 0):
     print(text)
     talk(text)
     #モーションズレ補正
     time.sleep(0.2)
     #口パク
-    transfer.transfer_utterance(text)
+    if debugmode == 0:
+        transfer.transfer_utterance(text)
     #読み上げ終了待ち
     while(True):
         if transfer.is_talkend():
@@ -116,6 +122,9 @@ def len_utterance_mono_lst():
 
 def len_utterance_op_lst():
     return len(utterance.op_lst)
+
+def len_utterance_filler_lst():
+    return len(utterance.filler_lst)
 
 if __name__ == '__main__':
 #    #args[1] = sentence

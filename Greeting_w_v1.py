@@ -310,6 +310,15 @@ def greeting_main(url, mode = 0):
                 cls_chat.end()
                 llm_chat.begin()
                 print("chatmode ", chatmode)
+            
+            if intent == 'Terminate':
+                #終了
+                talk.read_text('あいさつユニット終了します。よろしいですか？')
+                intent, val = cls_chat()
+                if intent == 'Positive':
+                    break
+                else:
+                    talk.read_text('あいさつユニット継続します')
 
         #30秒無言だと会話モード終了
 #        if chatmode == True and ((time.time() - cls_chat.get_chat_time()) > 30): #for debug

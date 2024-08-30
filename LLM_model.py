@@ -1,36 +1,39 @@
-from abc import ABCMeta, abstractclassmethod
+from abc import ABCMeta, abstractmethod
 import importlib
+import atexit
 
 ###大規模自然言語モデルの継承クラス
 
 class llm(metaclass=ABCMeta):
-    @abstractclassmethod
+    @classmethod
+    @abstractmethod
     def import_lib(self):
         pass
 
-    @abstractclassmethod
+    @classmethod
+    @abstractmethod
     def response(self, text, before):
         pass
 
 class ELYZA_model(llm):
     def import_lib(self):
-        self.model = importlib.import_module('ELYZA_res')
+        self.model = importlib.import_module('ELYZA_res').ELYZA()
 
-    def response(self, text, before=""):
+    def response(self, text, before=''):
         return self.model.response(text, before)
 
 class RINNA_youri_model(llm):
     def import_lib(self):
         self.model = importlib.import_module('rinna_youri_res')
 
-    def response(self, text, before=""):
+    def response(self, text, before=''):
         return self.model.response(text)
 
 class RINNA_nekomata_model(llm):
     def import_lib(self):
         self.model = importlib.import_module('rinna_nekomata_res')
 
-    def response(self, text, before=""):
+    def response(self, text, before=''):
         return self.model.response(text)
 
 class RINNA_GPTQ_model(llm):
@@ -44,14 +47,14 @@ class LINE_model(llm):
     def import_lib(self):
         self.model = importlib.import_module('LINE_res')
 
-    def response(self, text, before=""):
+    def response(self, text, before=''):
         return self.model.response(text)
 
 class SWALLOW_model(llm):
     def import_lib(self):
         self.model = importlib.import_module('Swallow_res')
 
-    def response(self, text, before=""):
+    def response(self, text, before=''):
         return self.model.response(text)
     
 if __name__ == '__main__':
