@@ -8,7 +8,7 @@ import threading
 import datetime
 import atexit
 
-DEFAULT_SYSTEM_PROMPT = 'あなたの年齢は20歳です。 受付をしている女性です。 名前はようです。 特に指示が無い場合は、 常に日本語で回答してください。\n'
+DEFAULT_SYSTEM_PROMPT = 'あなたの年齢は20歳です。 受付をしている女性です。 名前はまうです。 特に指示が無い場合は、 常に日本語で回答してください。\n'
 DEFAULT_SYSTEM_PROMPT2 = '以下のコンテキストも参照して回答してください。\nコンテキスト：'
 DEFAULT_SYSTEM_PROMPT3 = '以下の会話履歴も参考に回答してください。 \n会話：'
 DEFAULT_SYSTEM_PROMPT4 = '目の前に見えている景色も参考に回答してください。\n見えている景色：'
