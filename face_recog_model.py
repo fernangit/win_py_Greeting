@@ -1,19 +1,22 @@
-from abc import ABCMeta, abstractclassmethod
+from abc import ABCMeta, abstractmethod
 import importlib
 import cv2 as cv
 
 ###顔認証モデルの継承クラス
 
 class face(metaclass=ABCMeta):
-    @abstractclassmethod
+    @classmethod
+    @abstractmethod
     def import_lib(self):
         pass
 
-    @abstractclassmethod
+    @classmethod
+    @abstractmethod
     def get_facedb(self):
         pass
 
-    @abstractclassmethod
+    @classmethod
+    @abstractmethod
     def recognize_face(self, frame):
         pass
 

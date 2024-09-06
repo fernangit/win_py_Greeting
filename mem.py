@@ -12,7 +12,7 @@ def initialize(k):
 
 def memorize(memory, user, system):
     tdatetime = dt.now()
-    tstr = tdatetime.strftime('%Y年%m月%d日％H時％M分'.encode('unicode-escape').decode()).encode().decode('unicode-escape')
+    tstr = tdatetime.strftime('%Y年%m月%d日%H時%M分'.encode('unicode-escape').decode()).encode().decode('unicode-escape')
     #ユーザーメッセージとA1 メッセージの追加{
     memory.chat_memory.add_user_message(tstr+user)
     memory.chat_memory.add_ai_message(tstr+system)

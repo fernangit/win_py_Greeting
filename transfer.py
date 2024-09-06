@@ -1,4 +1,4 @@
-import pyautogui
+import keyboard
 import time
 import math
 
@@ -13,40 +13,35 @@ talkend = True
 
 def transfer_utterance(utterance):
     list(utterance)
-    butt = ''
+    bkey = ''
     talkend = False
     for num in range(len(utterance)):
         utt = utterance[num]
         if utt in a:
 #            print('あ')
-            pyautogui.hotkey('a')
-            time.sleep(0.02)
+            key = 'a'
         elif utt in i:
 #            print('い')
-            pyautogui.hotkey('i')
-            time.sleep(0.02)
+            key = 'i'
         elif utt in u:
 #            print('う')
-            pyautogui.hotkey('u')
-            time.sleep(0.02)
+            key = 'u'
         elif utt in e:
 #            print('え')
-            pyautogui.hotkey('e')
-            time.sleep(0.02)
+            key = 'e'
         elif utt in o:
 #            print('お')
-            pyautogui.hotkey('o')
-            time.sleep(0.02)
+            key = 'o'
         elif utt in n:
 #            print('ん')
-            pyautogui.hotkey('n')
-            time.sleep(0.02)
+            key = 'n'
         else:
             #一つ前の音にする
-            transfer_utterance(butt)
-            utt = butt
-            time.sleep(0.02)
-        butt = utt
+            key = bkey
+
+        keyboard.send(key)
+        time.sleep(0.1)
+        bkey = key
     talkend = True
 
 def is_talkend():

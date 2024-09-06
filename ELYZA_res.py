@@ -160,12 +160,12 @@ class ELYZA:
         mem.save(self.memory, './mem/memory.txt')
 
 if __name__ == '__main__':
-    llm_motel = ELYZA()
+    llm_model = ELYZA()
     while(True):
         text = input('?(qで終了):')
         if text == 'q' or text == 'Q':
             print('finished')
             break
-        r = llm_motel.response(text)
+        r = llm_model.response(text)
 
     img_loop = False
