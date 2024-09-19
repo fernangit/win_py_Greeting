@@ -24,8 +24,8 @@ print('Using device:', device)
 #### insightface のモデル読み込み
 start = time.perf_counter()
 #prepare face analysis
-#face_analysis = insightface.app.FaceAnalysis(name = 'insightface/models/buffalo_l', providers = ['CUDAExecutionProvider', 'CPUExecutionProvider'])
-face_analysis = insightface.app.FaceAnalysis(providers = ['CUDAExecutionProvider', 'CPUExecutionProvider'])
+#face_analysis = insightface.app.FaceAnalysis(name = 'insightface/models/buffalo_l', providers = ['CUDAExcutionProvider', 'CPUExecutionProvider'])
+face_analysis = insightface.app.FaceAnalysis(providers = ['CUDAExcutionProvider', 'CPUExecutionProvider'])
 face_analysis.prepare(ctx_id=0, det_size=(640, 640))
 print('モデル読み込み', time.perf_counter() - start)
 
