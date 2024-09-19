@@ -8,16 +8,17 @@ import pyautogui
 import winsound
 import threading
 
-motion_list = ['c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x', '4']
+motion_list = ['c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x']
 response1_list = ['d', 'f', 'g', 'q', 'r', 'v', 'w']
 response1_dict = {'d':1, 'f':2, 'g':3, 'q':10, 'r':11, 'v':14, 'w':15}
 response2_list = ['h', 'j', 'k']
 response2_dict = {'h':4, 'j':5, 'k':6}
 #注：dance_listとsound_listの配列番号は対応させること
-dance_list = ['1', '2', '3', '5', '6', '7', '8', '9']
+dance_list = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
 sound_list = ['./source/sound1.wav',
               './source/sound2.wav',
               './source/sound3.wav',
+              './source/sound4.wav',
               './source/sound5.wav',
               './source/sound6.wav',
               './source/sound7.wav',

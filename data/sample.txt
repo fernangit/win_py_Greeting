@@ -1,0 +1,225 @@
+サンプル
+外部のプログラム（Pythonで作成）からUnityで作成したプログラムの3Dキャラクターのアニメーションを動かすシステムが必要になったので作成しました。
+色々したので備忘録的に記録を残しておきます。
+
+Unity 2021.3.18f1
+Python 3.10.10
+greeting.gif
+システム概要
+アニメーションプログラム（Unity→WebGL）
+アニメーションプログラムはUnityで作成、WebGL向けにビルドし、サーバで実行します。
+外部プログラムとのIFはアニメーション呼び出しにキーイベント、テキスト受け渡しにファイルを使用します。
+
+アニメーション呼び出し
+アニメーションを各キーに割り付けておき、外部プログラムからキーシミュレーションにより任意のアニメーションを呼び出します。
+テキスト受け渡し
+外部プログラムはサーバ上の\Assets\StreamingAssetsに配置されたテキストファイルに任意のタイミングでテキストを書き込み、アニメーションプログラムはこのテキストファイルをモニタリングします。
+外部プログラム（Python）
+キーシミュレーションでUnity（WebGL）のアニメーションを呼び出します。
+アニメーションプログラムに渡したいテキスト内容を、POST通信によりサーバに送信します。
+
+サーバサイドプログラム（Python/flask）
+外部プログラムがPOST通信によりサーバに送信したテキストをサーバサイドプログラムが受け取り、\Assets\StreamingAssetsに配置されたファイルに書き込みます。
+
+3Dキャラクター作成
+１から3Dキャラクターをモデリングすると大変なので、ベースが用意されているものを利用します。
+
+ツール
+DAZ Studio（https://www.daz3d.com/）
+Vroid Studio（https://vroid.com/studio）
+ReadyPlayerme（https://readyplayer.me/）
+参考）DAZで作ったキャラクター
+DAZ.png
+参考）Vroidで作ったキャラクター
+vroid.png
+参考）ReadyPlayermeで作ったキャラクター
+Ready.png
+
+DAZではリアルなキャラクターを作れるのですが、見る側の要求ハードルが上がります（ちょっとした表情などに違和感を感じてしまう）。ReadyPlayermeで作成したキャラクターは、単純に好みでないので、今回は、Vroid Studioのアニメっぽいキャラークターを採用しました。
+
+Vroid Studioの操作、キャラクター作成についてはこちらを参照しました。
+https://character-movie.com/vroid-guide/
+
+3DキャラクターのUnityへのインポート
+Vroid StudioからUnityへのインポートについてはこちらを参照しました。
+https://dianxnao.com/vroid%e3%81%a7%e4%bd%9c%e3%81%a3%e3%81%9f%e3%83%a2%e3%83%87%e3%83%ab%e3%82%92unity%e3%81%ab%e5%8f%96%e3%82%8a%e8%be%bc%e3%82%93%e3%81%a7%e5%8b%95%e3%81%8b%e3%81%99%e6%89%8b%e9%a0%86unity-2020-3-lts/
+
+メモ
+Vroid StudioからVRM形式でエクスポート
+UniVRMパッケージをインポートして、VRMファイルをドラッグ＆ドロップしてインポート
+※DAZ Studioからはfbx形式でエクスポートできるので、そのままUnityにドラッグ＆ドロップしてインポート
+※ReadyPlayermeからはglb形式でエクスポートされるので、いったんBlenderで読み込んでVRM形式でエクスポート
+
+アニメーション作成
+配布モーションの利用
+fbxフォーマット
+
+fbxファイルをドラッグ＆ドロップしてUnityにインポート
+Humanoid型に変換
+修正・編集のためanimファイルをコピー（Ctrl+d）
+vmdフォーマット
+
+MMD4mecanimでfbxに変換
+MMD4mecanimについてはこちらを参照しました。
+https://xr-hub.com/archives/12978
+メモ
+Unity 2017.4.15f1で動作確認
+Unity 2021.3.4f1では動作せず
+MMD4mecanimで変換されたオン出るをUnity以外で利用することは禁止
+こちらも使えるかも（試してない）
+https://anyconv.com/ja/vmd-to-fbx-konbata/
+※配布モーションを使用する際は、利用許諾に従うこと
+
+自前モーションの作成・編集
+モーションの作成
+Blenderでポーズを作成、タイムラインにキーフレームを追加します。こちらを参照しました。　　
+https://yuyu-log.com/vrm-animation/
+
+メモ
+ドープシートエディタで地道に編集
+fbx形式でエクスポート
+メモ
+
+Unity
+TimeLineを利用して複数アニメーションのブレンド、表情とのブレンドを行います。
+サンプルプログラム
+アニメーションプログラム
+アニメーション制御サンプル（Unity C#）
+TimeLineとキーを割り付けるプログラム
+複数のTimeLineを引数で渡しておき、入力キーに対応したTimeLineを呼び出します。
+Playable Director コンポーネントは、TimeLineの再生を制御します。
+※アニメーションごとに、メインカメラとバーチャルカメラ（動きが大きいモーションをカメラを追従させる）を切り替えています。
+  //引数宣言
+  [SerializeField] private TimelineAsset[] timelines;
+  private PlayableDirector director;
+  // Update is called once per frame
+  void Update()
+  {
+    :
+    :
+    :
+      //キー入力あり
+      if (evt == true)
+      {
+          // モーション中はキーを受け付けない
+          if (motionStatus == false)
+          {
+              //Sleepモードでないときはロック
+              if (key != "y")
+              {
+                  motionStatus = true;
+              }
+              string textName = "key" + key + "_credit.txt";
+              readText(Application.streamingAssetsPath + "/Text/" + textName, textUI1);
+              if (cammode == 0)
+              {
+                  //メインカメラ
+                  CameraPositionInitialize();
+              }
+              else
+              {
+                  //バーチャルカメラ
+                  vcamObj.SetActive(true); 
+              }
+              EventPlay(evtnum);
+          }
+      }
+    :
+    :
+    :
+  }
+
+  //イベント再生メソッド ボタンに割り当てる
+  public void EventPlay(int id)
+  {
+      director.Play(timelines[id]);
+  }
+テキスト表示サンプル（unity C#）
+テキストファイルをモニタリング、読み込むプログラム
+  // Update is called once per frame
+  void Update()
+  {
+    :
+    :
+    :
+        readText(Application.streamingAssetsPath + "/Utterance/utter.txt", textUI2);
+    :
+    :
+    :
+  }
+
+  private void readText(string textpath, TextMeshProUGUI textUI)
+  {
+      StartCoroutine(ReadWebText(textpath, textUI));
+  }
+
+  IEnumerator ReadWebText(string textpath, TextMeshProUGUI textUI)
+  {
+      UnityWebRequest www = UnityWebRequest.Get(textpath);
+      yield return www.SendWebRequest();
+
+      if (www.isNetworkError || www.isHttpError)
+      {
+          Debug.Log(www.error);
+          Console.WriteLine("ファイルを読み込めませんでした");
+      }
+      else
+      {
+          // 結果をテキストとして表示します
+          textUI.text = www.downloadHandler.text;
+      }
+  }
+外部プログラム
+アニメーション呼び出しサンプル（Python）
+キー入力をシミュレートするプログラム
+import pyautogui
+import play
+
+motion_list = ['c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x', '4']
+
+#レベル対応モーション呼び出し
+def set_level_motion(level):
+  if level > len(motion_list) - 1:
+      level = len(motion_list) - 1
+  pyautogui.hotkey(motion_list[level])
+テキスト送信サンプル（Python）
+import requests
+
+def send_utterance(url, utterance):
+  payload = {'utterance':utterance}
+  response = requests.post(url, data = payload)
+サーバサイドプログラム
+テキスト書き込みサンプル（Python/flask）
+  @app.route('/StreamingAssets/Utterance', methods=['POST'])
+  def updateUtter():
+      filename = 'StreamingAssets/Utterance/utter.txt'
+      utterance = request.form['utterance']
+      with open(filename, mode='w') as fout:
+          fout.write(utterance)  
+      return utterance
+システム起動例
+サーバー起動
+ブラウザ起動
+アニメーションURLにアクセス（WebGL）
+外部プログラム起動（Python）
+その他
+バーチャルカメラ
+動作が大きいモーションはバーチャルカメラで追従させます。こちらを参照しました。
+https://gametukurikata.com/camera/cinemachinevirtualcamera
+口パクプログラム
+Unity側で「あ」、「い」、「う」...の口パクモーションを作っておきます。
+キー[a]、[i]、[u]...に割り付けます。
+python側で発話テキストを「あ」、「い」、「う」...に変換して、対応するモーションを呼び出します。
+モーションのクレジット記載（使用許諾に従い、作者等を表示します）
+モーションに対応するクレジットを記載したテキストファイルを作成します。
+モーションの切り替えと同時にモーションに対応するテキストを読み込み、設定したTextに表示します。
+メモ
+TextMeshProで日本語を表示する方法については、こちらを参照しました。
+https://www.midnightunity.net/textmeshpro-japanese-font/
+動画からモーション作成
+ThreeDPoseTracker
+https://digital-standard.com/tdpt/
+メモ
+BVH形式でエクスポート、Blenderで編集
+Plask（未試用）
+https://plask.ai/

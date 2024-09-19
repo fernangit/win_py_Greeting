@@ -62,7 +62,7 @@ def detect_eyes(image):
 def detect_faces_dlib(image):
     start = time.perf_counter()
     # 顔を検出する
-    lists = detector(img)
+    lists = detector(image)
 #    print('dlib 顔検出', time.perf_counter() - start)
 #    print('face lists = ', lists)
     return lists

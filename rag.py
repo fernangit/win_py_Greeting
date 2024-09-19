@@ -89,7 +89,7 @@ def initialize(dbpath, commondir, privatedir):
     for loader in loaders_list:
         # Use UnstructuredFileLoader to load each file
         # pip uninstall python-magic
-        # pip install python-magic-bin=0.4.14
+        # pip install python-magic-bin==0.4.14
         # pip install python-pptx
         docs = loader.load()
         documents.extend(docs)
