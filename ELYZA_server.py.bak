@@ -4,7 +4,8 @@ from flask import Flask, request
 import os
 from os.path import splitext
 
-DEFAULT_SYSTEM_PROMPT = '以下の基本情報も参照して回答してください。\n基本情報：'
+DEFAULT_SYSTEM_PROMPT = 'あなたの名前はまうです。あなたの年齢は20歳です。 受付をしている女性です。 特に指示が無い場合は、「まう」というキャラクターとして常に日本語で親しい間柄のフレンドリーな感じで回答してください。\n'
+BASE_INFORMATION = '以下の基本情報も参照して回答してください。\n基本情報：'
 
 quantization_config = BitsAndBytesConfig(
     load_in_4bit=True,
@@ -15,7 +16,7 @@ quantization_config = BitsAndBytesConfig(
 
 class ELYZA_srv:
     def __init__(self):
-        #https://.co/elyza/Llama-3-ELYZA-JP-8B
+        #https://huggingface.co/elyza/Llama-3-ELYZA-JP-8B
         self.model_name = 'elyza/Llama-3-ELYZA-JP-8B'
 #        self.model_name = 'weblab-GENIAC/Tanuki-8B-dpo-v1.0'
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
@@ -77,12 +78,13 @@ class ELYZA_srv:
         return output
 
     def response (self, prompt, text):
-        prompt += (DEFAULT_SYSTEM_PROMPT + self.base_info + '\n')
-        output = self.base_response (prompt, text) 
+        system_prompt = DEFAULT_SYSTEM_PROMPT + '\n' + prompt
+        system_prompt += (BASE_INFORMATION + self.base_info + '\n')
+        output = self.base_response (system_prompt, text) 
         print(output)
         return output
 
-llm_motel = ELYZA_srv()
+llm_model = ELYZA_srv()
 app = Flask(__name__, static_folder='.', static_url_path='')
 
 @app.route('/Utterance', methods=['POST'])
@@ -95,7 +97,7 @@ def updateUtter():
     print(text)
 
     #response
-    res = llm_motel.response(prompt, text)
+    res = llm_model.response(prompt, text)
 
     filename = 'Utterance/utter.txt'
     with open(filename, mode='w', encoding='utf-8') as fout:
