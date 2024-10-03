@@ -85,6 +85,7 @@ class chat():
         self.mesbefore = ''
         self.resbefore = ''
         self.started.set()
+        self.chat_time = time.time()
 
     def end(self):
         self.started.clear()
