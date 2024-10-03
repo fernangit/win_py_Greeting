@@ -125,7 +125,6 @@ class chat():
             self.response = 'すみません、もういちどおねがいしますー'
             self.resbefore = ''
 
-        self.chat_time = time.time()
         return self.response
 
     def chat_sentence_thread(self):

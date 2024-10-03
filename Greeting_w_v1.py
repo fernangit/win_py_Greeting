@@ -27,6 +27,9 @@ import object_detection_mp
 FACE_RECOGNITION_FACENET = 0
 FACE_RECOGNITION_INSIGHTFACE = 1
 
+#debugmode
+DEBUG = 1
+
 #時刻初期化
 def initialize_time():
     #現在時刻読み取り
@@ -240,7 +243,7 @@ def photo(photomode, chatmode, phototime, frame, cls_chat, llm_chat, objdetect, 
         objdetect.front()
 
         #フォトモード中の表示
-        talk.read_text('さつえいちゅう。。。ピースサインでさつえいするよ')
+        talk.read_text('さつえいちゅう。。。ピースサインでさつえいするよ', DEBUG)
         send_receive_server.send_utterance(url, '撮影中。。。ピースサインで撮影するよ', '0', '', '')
         phototime = time.time()
     
@@ -274,7 +277,7 @@ def chat(chatmode, photomode, cls_chat, llm_chat, text, old_text, message, old_m
         if intent == 'MAU' or intent == 'Greeting' or intent == 'CallOut':
             #呼びかけで会話モード開始
             print('＊＊＊会話モード開始＊＊＊')           
-            talk.read_text('はいーなんでしょうかー')           
+            talk.read_text('はいーなんでしょうかー', DEBUG)           
             chatmode = True
             message = ''
             response = ''
@@ -287,12 +290,12 @@ def chat(chatmode, photomode, cls_chat, llm_chat, text, old_text, message, old_m
         
         if intent == 'Terminate':
             #終了
-            talk.read_text('あいさつユニット終了します。よろしいですか？')
+            talk.read_text('あいさつユニット終了します。よろしいですか？', DEBUG)
             intent, val = cls_chat.cls_chat()
             if intent == 'Positive':
                 exit = True
             else:
-                talk.read_text('あいさつユニット継続します')
+                talk.read_text('あいさつユニット継続します', DEBUG)
 
     #30秒無言だと会話モード終了
 #        if chatmode == True and ((time.time() - cls_chat.get_chat_time()) > 30): #for debug
@@ -444,11 +447,11 @@ def greeting_main(url, mode = 0):
         photomode, phototime, barcodeData, chatmode, intent, val \
         = photo(photomode, chatmode, phototime, frame, cls_chat, llm_chat, objdetect, intent, val, url)
 
-        # #チャット
-        # chatmode, text, old_text, message, old_message, response, old_response, intent, val, exit \
-        # = chat(chatmode, photomode, cls_chat, llm_chat, text, old_text, message, old_message, response, old_response, intent, val, url)
-        # if exit == True:
-        #     break
+        #チャット
+        chatmode, text, old_text, message, old_message, response, old_response, intent, val, exit \
+        = chat(chatmode, photomode, cls_chat, llm_chat, text, old_text, message, old_message, response, old_response, intent, val, url)
+        if exit == True:
+            break
 
         #挨拶
         t_st = greet(t_st, frame, hasFrame, face_model, mode, chatmode, photomode, d, url)
