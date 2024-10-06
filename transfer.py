@@ -13,7 +13,7 @@ talkend = True
 
 def transfer_utterance(utterance):
     list(utterance)
-    bkey = ''
+    bkey = 'n'
     talkend = False
     for num in range(len(utterance)):
         utt = utterance[num]

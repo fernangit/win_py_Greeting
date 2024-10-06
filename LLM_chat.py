@@ -9,6 +9,7 @@ import speech_recog_model
 SPEECH_RECOGNITION_GOOGLE = 0
 SPEECH_RECOGNITION_JULIUS = 1
 SPEECH_RECOGNITION_VOSK = 2
+SPEECH_RECOGNITION_FWHISPER = 3
 
 #llm mode
 LLM_ELYZA = 0
@@ -54,6 +55,9 @@ class chat():
             self.speech_model = speech_recog_model.JULIUS_model()
         elif speech_mode == SPEECH_RECOGNITION_VOSK:
             ### for vosk
+            self.speech_model = speech_recog_model.VOSK_model()
+        elif speech_mode == SPEECH_RECOGNITION_FWHISPER:
+            ### for faster whisper
             self.speech_model = speech_recog_model.VOSK_model()
 
     def select_llm_model(self, llm_mode):
@@ -148,7 +152,7 @@ class chat():
         return self.response
 
 if __name__ == '__main__':
-    test = chat(SPEECH_RECOGNITION_VOSK, LLM_ELYZA)
+    test = chat(SPEECH_RECOGNITION_FWHISPER, LLM_ELYZA)
     test.begin()
     while True:
         # time.sleep(1)

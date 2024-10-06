@@ -117,7 +117,7 @@ if __name__ == '__main__':
             thread = threading.Thread(target=playSound, args=(sound_list[int(args[1])],))
             thread.start()
             #モーションズレ補正
-            time.sleep(0.2)
+            time.sleep(0.3)
             keyboard.send(dance_list[int(args[1])])
             print("key press " + dance_list[int(args[1])])
             time.sleep(0.1)

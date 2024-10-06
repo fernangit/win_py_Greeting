@@ -230,14 +230,11 @@ def photo(photomode, chatmode, phototime, frame, cls_chat, llm_chat, objdetect, 
     if photomode == False and barcodeData != '':
         #コード読み取り成功
         photomode = True
+        print('photomode:True')
 
         #チャットモード抑制
         chatmode = False
-        intent = ''
-        val = 0
-        cls_chat.reset_user_intent()
-        cls_chat.begin()
-        llm_chat.end()
+        print('chatmode:False')
 
         #フォト画面最前面化
         objdetect.front()
@@ -252,8 +249,9 @@ def photo(photomode, chatmode, phototime, frame, cls_chat, llm_chat, objdetect, 
         #フォトモードから30秒経過？
         if ((time.time() - phototime) > 30):
             #フォトモード終了
-            objdetect.back()
+            objdetect.back() #後面に表示
             photomode = False
+            print('photomode:False')
 
             #フォトモード中の表示を消す
             send_receive_server.send_utterance(url, '', '0', '', '')
@@ -272,6 +270,16 @@ def chat(chatmode, photomode, cls_chat, llm_chat, text, old_text, message, old_m
             intent = ''
             val = 0
 
+        if val > 6.5:
+            if intent == 'Terminate':
+                #終了
+                talk.read_text('あいさつユニット終了します。よろしいですか？', DEBUG)
+                intent, val = cls_chat.cls_chat()
+                if intent == 'Positive':
+                    exit = True
+                else:
+                    talk.read_text('あいさつユニット継続します', DEBUG)
+
     #呼びかけ
     if chatmode == False and val > 6.5:
         if intent == 'MAU' or intent == 'Greeting' or intent == 'CallOut':
@@ -279,6 +287,7 @@ def chat(chatmode, photomode, cls_chat, llm_chat, text, old_text, message, old_m
             print('＊＊＊会話モード開始＊＊＊')           
             talk.read_text('はいーなんでしょうかー', DEBUG)           
             chatmode = True
+            print('chatmode:True')
             message = ''
             response = ''
             old_text = text
@@ -288,23 +297,14 @@ def chat(chatmode, photomode, cls_chat, llm_chat, text, old_text, message, old_m
             llm_chat.begin()
             print("chatmode ", chatmode)
         
-        if intent == 'Terminate':
-            #終了
-            talk.read_text('あいさつユニット終了します。よろしいですか？', DEBUG)
-            intent, val = cls_chat.cls_chat()
-            if intent == 'Positive':
-                exit = True
-            else:
-                talk.read_text('あいさつユニット継続します', DEBUG)
-
-    #30秒無言だと会話モード終了
-#        if chatmode == True and ((time.time() - cls_chat.get_chat_time()) > 30): #for debug
     if chatmode == True:
-        if ((time.time() - llm_chat.get_chat_time()) > 30):
+        #30秒無言だと会話モード終了
+        if ((time.time() - llm_chat.get_chat_time()) > 60):
             print('＊＊＊会話モード終了＊＊＊')           
             motion.set_byebye_motion()
             talk.talk('ばいばーい')
             chatmode = False
+            print('chatmode:False')
             intent = ''
             val = 0
             cls_chat.reset_user_intent()
@@ -383,6 +383,7 @@ def gesture(photomode, frame, barcodeData, objdetect, d, url):
             pyautogui.screenshot(photofile)
             objdetect.back()
             photomode = False
+            print('photomode:False')
             #フォトモード中の表示を消す
             send_receive_server.send_utterance(url, '', '0', '', '')
         ###### for photo
@@ -410,6 +411,7 @@ def greeting_main(url, mode = 0):
     # チャット
     llm_chat = LLM_chat.chat(LLM_chat.SPEECH_RECOGNITION_VOSK, LLM_chat.LLM_ELYZA)
     chatmode = False
+    print('chatmode:False')
     message = old_message = ''
     response = old_response = ''
     
@@ -422,11 +424,14 @@ def greeting_main(url, mode = 0):
 
     #フォトモード初期化
     photomode = False
+    print('photomode:False')
     phototime = time.time()
 
     #スプラッシュスクリーン
-    objdetect = object_detection_mp.ObjectDetection(cap)
-#    objdetect = object_detection_rembg.ObjectDetection(cap)
+#    pcap = cv.VideoCapture(1) #別カメラ使用
+    pcap = cap
+    objdetect = object_detection_mp.ObjectDetection(pcap)
+#    objdetect = object_detection_rembg.ObjectDetection(pcap)
     objdetect.back()
 
     while True:

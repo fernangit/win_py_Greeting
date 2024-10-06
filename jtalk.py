@@ -14,9 +14,13 @@ def jtalk(t):
     c = subprocess.Popen(cmd,stdin=subprocess.PIPE)
 
     #convert text encodeing from utf-8 to shift-jis
-    c.stdin.write(t.encode('shift-jis'))
-    c.stdin.close()
-    c.wait()
+    try:
+        c.stdin.write(t.encode('shift-jis'))
+        c.stdin.close()
+        c.wait()
+    except:
+        print('encode error')
+        
     winsound.PlaySound('open_jtalk.wav',  winsound.SND_FILENAME)
 
 def say_datetime():
