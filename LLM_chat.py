@@ -143,6 +143,7 @@ class chat():
         time.sleep(6)
         while(self.filler_alive):
             talk.filler()
+            self.chat_time = time.time()
             time.sleep(3)
 
     def get_user_message(self):
@@ -155,13 +156,13 @@ if __name__ == '__main__':
     test = chat(SPEECH_RECOGNITION_FWHISPER, LLM_ELYZA)
     test.begin()
     while True:
-        # time.sleep(1)
-        # if(time.time() - test.get_chat_time()) > 60:
-        #     test.end()
-        #     break
-        text = input('?(qで終了):')
-        if text == 'q' or text == 'Q':
-            print('finished')
+        time.sleep(1)
+        if(time.time() - test.get_chat_time()) > 60:
+            test.end()
             break
+        # text = input('?(qで終了):')
+        # if text == 'q' or text == 'Q':
+        #     print('finished')
+        #     break
         
     test.kill()
