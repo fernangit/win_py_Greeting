@@ -58,7 +58,7 @@ class chat():
             self.speech_model = speech_recog_model.VOSK_model()
         elif speech_mode == SPEECH_RECOGNITION_FWHISPER:
             ### for faster whisper
-            self.speech_model = speech_recog_model.VOSK_model()
+            self.speech_model = speech_recog_model.FWHISPER_model()
 
     def select_llm_model(self, llm_mode):
         #LLM model
@@ -93,6 +93,7 @@ class chat():
 
     def end(self):
         self.started.clear()
+        self.filler_alive = False
         print('llm end')
 
     def kill(self):
@@ -108,24 +109,19 @@ class chat():
         self.response = self.resbefore
         try:
             self.data = ''
-            t1 = time.time()
             self.user_message = self.mesbefore + '\n' + self.speech_model.get_message(self.speech_ret)
-            t2 = time.time()
             print(self.user_message)
             self.filler = threading.Thread(target=self.chat_filler_thread)
             self.filler.start()
             self.filler_alive = True
             self.response = self.llm_model.response(self.user_message, self.resbefore)
             self.filler_alive = False
-            t3 = time.time()
             if len(self.resbefore) >= 10 and self.resbefore in self.response:
                 # レスポンスに前回と同一文章（10文字以上）を含む場合はリセット
                 raise Exception
             # 3センテンスのみ前回文章として読み込ませる
             self.resbefore = '。'.join(self.response.split('。')[:3])
             print('resbefore:', self.resbefore)
-            print('talk recognize:', t2 - t1)
-            print('response create:', t3 - t2)
         except:
             self.response = 'すみません、もういちどおねがいしますー'
             self.resbefore = ''
@@ -157,7 +153,7 @@ if __name__ == '__main__':
     test.begin()
     while True:
         time.sleep(1)
-        if(time.time() - test.get_chat_time()) > 60:
+        if(time.time() - test.get_chat_time()) > 30:
             test.end()
             break
         # text = input('?(qで終了):')

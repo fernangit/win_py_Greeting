@@ -9,6 +9,7 @@ import text_classification
 SPEECH_RECOGNITION_GOOGLE = 0
 SPEECH_RECOGNITION_JULIUS = 1
 SPEECH_RECOGNITION_VOSK = 2
+SPEECH_RECOGNITION_FWHISPER = 3
 
 class clsChat():          
     def __init__(self, speech_mode):
@@ -38,6 +39,9 @@ class clsChat():
         elif speech_mode == SPEECH_RECOGNITION_VOSK:
             ### for vosk
             self.speech_model = speech_recog_model.VOSK_model()
+        elif speech_mode == SPEECH_RECOGNITION_FWHISPER:
+            ### for faster whisper
+            self.speech_model = speech_recog_model.FWHISPER_model()
 
     def __del__(self):
         self.kill()
@@ -62,15 +66,10 @@ class clsChat():
 
     def cls_chat(self):
         try:
-            t1 = time.time()
             self.user_message = self.speech_model.get_message(self.speech_ret)
-            t2 = time.time()
             print('user_message=', self.user_message)
             label, val = text_classification.get_label(self.user_message)
-            t3 = time.time()
             print(label, val)
-            print('talk recognize:', t2 - t1)
-            print('classified:', t3 - t2)
         except:
             label = ''
             val = 0.0
