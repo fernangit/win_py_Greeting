@@ -118,7 +118,6 @@ class chat():
                 raise Exception
             # 3センテンスのみ前回文章として読み込ませる
             self.resbefore = '。'.join(self.response.split('。')[:3])
-            print('resbefore:', self.resbefore)
         except:
             self.response = 'すみません、もういちどおねがいしますー'
             self.resbefore = ''
