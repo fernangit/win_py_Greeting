@@ -16,8 +16,8 @@ WAVE_OUTPUT_FILENAME = "output.wav"
 
 class FWhisper:
     def init(self):
-        model_size = "large-v3"
-        #model_size = "small"
+        # model_size = "large-v3"
+        model_size = "small"
 
         # Run on GPU with FP16
         model = WhisperModel(model_size, device="cuda", compute_type="float16")

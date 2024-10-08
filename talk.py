@@ -82,14 +82,13 @@ def read_sentence_file(sentence_file):
         with open(sentence_file, encoding="utf-8") as f:
             read_text(f.read())
 
-def read_text(text, debugmode = 0):
+def read_text(text):
     print(text)
     talk(text)
     #モーションズレ補正
     time.sleep(0.2)
     #口パク
-    if debugmode == 0:
-        transfer.transfer_utterance(text)
+    transfer.transfer_utterance(text)
     #読み上げ終了待ち
     while(True):
         if transfer.is_talkend():

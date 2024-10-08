@@ -19,9 +19,6 @@ LLM_RINNA_GPTQ = 3
 LLM_LINE = 4
 LLM_SWALLOW = 5
 
-#debugmode
-DEBUG = 1
-
 class chat():          
     def __init__(self, speech_mode, llm_mode):
         self.started = threading.Event()
@@ -109,8 +106,8 @@ class chat():
         self.response = self.resbefore
         try:
             self.data = ''
-            self.user_message = self.mesbefore + '\n' + self.speech_model.get_message(self.speech_ret)
-            print(self.user_message)
+            self.user_message = self.speech_model.get_message(self.speech_ret)
+            print('llm_user_message=', self.user_message)
             self.filler = threading.Thread(target=self.chat_filler_thread)
             self.filler.start()
             self.filler_alive = True
@@ -131,7 +128,7 @@ class chat():
     def chat_sentence_thread(self):
         self.started.wait()
         while self.alive:
-            talk.read_text(self.llm_chat(), DEBUG)
+            talk.read_text(self.llm_chat())
             self.started.wait()
             self.chat_time = time.time()
 
@@ -149,7 +146,7 @@ class chat():
         return self.response
 
 if __name__ == '__main__':
-    test = chat(SPEECH_RECOGNITION_FWHISPER, LLM_ELYZA)
+    test = chat(SPEECH_RECOGNITION_VOSK, LLM_ELYZA)
     test.begin()
     while True:
         time.sleep(1)

@@ -1,4 +1,4 @@
-import keyboard
+import keyinp
 import time
 import math
 
@@ -39,7 +39,7 @@ def transfer_utterance(utterance):
             #一つ前の音にする
             key = bkey
 
-        keyboard.send(key)
+        keyinp.send(key)
         time.sleep(0.1)
         bkey = key
     talkend = True

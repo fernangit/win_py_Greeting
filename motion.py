@@ -3,7 +3,7 @@ import sys
 import os
 import time
 import random
-import keyboard
+import keyinp
 import pyautogui
 import winsound
 import threading
@@ -27,23 +27,23 @@ sound_list = ['./source/sound1.wav',
 
 #起動時モーション
 def set_first_motion():
-    keyboard.send('b')
-#    print("keyboard.send('b')")
+    keyinp.send('b')
+#    print("keyinp.send('b')")
 
 #Sleepモーション
 def set_sleep_motion():
-    keyboard.send('y')
+    keyinp.send('y')
 
 #Response1モーション
 def set_response1_motion():
     res_key = response1_list[random.randint(0, len(response1_list)-1)]
-    keyboard.send(res_key)
+    keyinp.send(res_key)
     return res_key
 
 #Response2モーション
 def set_response2_motion():
     res_key = response2_list[random.randint(0, len(response2_list)-1)]
-    keyboard.send(res_key)
+    keyinp.send(res_key)
     return res_key
 
 #所定時刻の所定モーション呼び出し
@@ -58,13 +58,13 @@ def set_default_motion(now_time):
                 thread.start()
                 #モーションズレ補正
                 time.sleep(0.2)
-            keyboard.send('1')
+            keyinp.send('1')
             if os.path.isfile(sound_list[0]) == True:
                 #音声終了待ち
                 thread.join()
         if now_time.hour == 12 and now_time.minute == 30 and now_time.second == 0:
             #12:30 昼休み
-            keyboard.send('b')
+            keyinp.send('b')
             winsound.PlaySound('昼休み.wav',  winsound.SND_FILENAME)
         if now_time.hour == 17 and now_time.minute == 00 and now_time.second == 0:
             #17:00 ダンスの時間
@@ -75,7 +75,7 @@ def set_default_motion(now_time):
                 thread.start()
                 #モーションズレ補正
                 time.sleep(0.2)
-            keyboard.send(dance_list[motion])
+            keyinp.send(dance_list[motion])
             if os.path.isfile(sound_list[motion]) == True:
                 #音声終了待ち
                 thread.join()
@@ -85,18 +85,18 @@ def set_level_motion(level):
     print('level:', level)
     if level > len(motion_list) - 1:
         level = len(motion_list) - 1
-    keyboard.send(motion_list[level])
-#    print("keyboard.send(motion_list[level])")
+    keyinp.send(motion_list[level])
+#    print("keyinp.send(motion_list[level])")
 
 #GOOD JOBモーション呼び出し
 def set_goodjob_motion():
-    keyboard.send(motion_list[16])
-#    print("keyboard.send(motion_list[16])")
+    keyinp.send(motion_list[16])
+#    print("keyinp.send(motion_list[16])")
 
 #バイバイモーション呼び出し
 def set_byebye_motion():
-    keyboard.send(motion_list[2])
-#    print("keyboard.send(motion_list[2])")
+    keyinp.send(motion_list[2])
+#    print("keyinp.send(motion_list[2])")
 
 #モーション数
 def get_motion_num():
@@ -118,14 +118,14 @@ if __name__ == '__main__':
             thread.start()
             #モーションズレ補正
             time.sleep(0.3)
-            keyboard.send(dance_list[int(args[1])])
+            keyinp.send(dance_list[int(args[1])])
             print("key press " + dance_list[int(args[1])])
             time.sleep(0.1)
             #ブラウザ最大化
-            keyboard.send('F11')
+            keyinp.send('F11')
             print("key press F11")
             time.sleep(1.0)
-            keyboard.send('z')
+            keyinp.send('z')
             print("key press z")
             time.sleep(1.0)
             pyautogui.click()

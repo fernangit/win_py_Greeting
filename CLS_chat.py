@@ -25,7 +25,7 @@ class clsChat():
         self.val = 0.0
         self.user_message = ''
 
-        self.thread = threading.Thread(target=self.chat_sentence_thread)
+        self.thread = threading.Thread(target=self.cls_sentence_thread)
         self.thread.start()
 
     def select_speech_model(self, speech_mode):
@@ -67,8 +67,8 @@ class clsChat():
     def cls_chat(self):
         try:
             self.user_message = self.speech_model.get_message(self.speech_ret)
-            print('user_message=', self.user_message)
             label, val = text_classification.get_label(self.user_message)
+            print('cls_user_message=', self.user_message)
             print(label, val)
         except:
             label = ''
@@ -76,7 +76,7 @@ class clsChat():
 
         return label, val
 
-    def chat_sentence_thread(self):
+    def cls_sentence_thread(self):
         self.started.wait()
         while self.alive:
             self.user_intent, self.val = self.cls_chat()
