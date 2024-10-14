@@ -187,6 +187,7 @@ def authenticate_face(face_recog_model, cropped_frame, greeting):
     if(detect_name != ''):
         # 登録
         regist_detected.regist_detected(detect_name)
+
         #類似度80%以上で今回データで差し替え
         if max_sim > 0.8:
             vector = face_recog_model.get_facedb() + '/' + detect_name
@@ -225,20 +226,18 @@ def reset_utterance(url):
     send_receive_server.send_utterance(url, '', '0', '', '')
 
 #フォト
-def photo(chatmode, photomode, exitmode, phototime, frame, cls_chat, llm_chat, objdetect, intent, val, url):
-    barcodeData = ''
-    if exitmode == False:
+def photo(chatmode, photomode, exitmode, phototime, frame, cls_chat, llm_chat, objdetect, intent, val, barcodeData, url):
+    if exitmode == False and photomode == False :
         #バーコード／QRコード認識
         barcodeData, x, y, w, h = read_code.readCode (frame)
     #    barcodeData = 'aa' #for debug
-        if photomode == False and barcodeData != '':
+        if barcodeData != '':
             #コード読み取り成功
             photomode = True
             print('photomode:True')
 
-            #チャットモード抑制
-            chatmode = False
-            print('chatmode:False')
+            #チャットモード終了
+            chatmode, intent, val = close_chatmode(chatmode, cls_chat, llm_chat, url)
 
             #フォト画面最前面化
             objdetect.front()
@@ -247,19 +246,25 @@ def photo(chatmode, photomode, exitmode, phototime, frame, cls_chat, llm_chat, o
             talk.read_text('さつえいちゅう。。。ピースサインでさつえいするよ')
             send_receive_server.send_utterance(url, '撮影中。。。ピースサインで撮影するよ', '0', '', '')
             phototime = time.time()
-        
-        if (photomode == True):
-            objdetect.splash_image(frame)
-            #フォトモードから30秒経過？
-            if ((time.time() - phototime) > 30):
-                #フォトモード終了
-                objdetect.back() #後面に表示
-                photomode = False
-                print('photomode:False')
 
-                #フォトモード中の表示を消す
-                send_receive_server.send_utterance(url, '', '0', '', '')
-    
+            return photomode, phototime, barcodeData, chatmode, intent, val
+        
+    if (photomode == True):
+        objdetect.splash_image(frame)
+        #フォトモードから30秒経過？
+        if ((time.time() - phototime) > 30):
+            #フォトモード終了
+            objdetect.back() #後面に表示
+            photomode = False
+            print('photomode:False')
+
+            #フォトモード中の表示を消す
+            send_receive_server.send_utterance(url, '', '0', '', '')
+
+            #チャットモード終了
+            chatmode, intent, val = close_chatmode(chatmode, cls_chat, llm_chat, url)
+
+
     return photomode, phototime, barcodeData, chatmode, intent, val
 
 #チャット
@@ -296,16 +301,8 @@ def chat(chatmode, exitmode, cls_chat, llm_chat, text, old_text, message, old_me
                 print('＊＊＊会話モード終了＊＊＊')           
                 motion.set_byebye_motion()
                 talk.talk('ばいばーい')
-                chatmode = False
-                print('chatmode:False')
-                intent = ''
-                val = 0
-                cls_chat.reset_user_intent()
-                #会話終了
-                cls_chat.begin()
-                llm_chat.end()
-                send_receive_server.send_utterance(url, '', '0', '', '')
-                print("chatmode ", chatmode)    
+                #チャットモード終了
+                chatmode, intent, val = close_chatmode(chatmode, cls_chat, llm_chat, url)
 
             #会話取得
             message = llm_chat.get_user_message()
@@ -327,17 +324,28 @@ def chat(chatmode, exitmode, cls_chat, llm_chat, text, old_text, message, old_me
             exit = True
         elif val > 6.5 and intent != '':
             talk.read_text('あいさつユニット継続します')
-            chatmode = False
             exitmode = False
-            print('chatmode:False')
-            cls_chat.reset_user_intent()
-            #会話終了
-            cls_chat.begin()
-            llm_chat.end()
-            send_receive_server.send_utterance(url, '', '0', '', '')
-            print("chatmode ", chatmode)    
+            #チャットモード終了
+            chatmode, intent, val = close_chatmode(chatmode, cls_chat, llm_chat, url)
 
     return chatmode, exitmode, text, old_text, message, old_message, response, old_response, intent, val, exit
+
+#チャットモード終了
+def close_chatmode(chatmode, cls_chat, llm_chat, url):
+    #チャットモード終了
+    chatmode = False
+    print('chatmode:False')
+    intent = ''
+    val = 0
+    cls_chat.reset_user_intent()
+    #会話終了
+    cls_chat.begin()
+    llm_chat.end()
+    llm_chat.filler_alive = False
+    send_receive_server.send_utterance(url, '', '0', '', '')
+    print("chatmode ", chatmode)    
+
+    return chatmode, intent, val
 
 #挨拶
 def greet(chatmode, photomode, exitmode, t_st, frame, hasFrame, face_model, mode, d, url):
@@ -378,8 +386,6 @@ def gesture(chatmode, photomode, exitmode, frame, barcodeData, objdetect, llm_ch
                 motion.set_goodjob_motion()
                 talk.talk('グッッジョーーブ')   
                 time.sleep(3)       
-
-            #response
             elif h_gesture == hand_gesture.H_PAPER:
                 #response1 motion
                 res_key = motion.set_response1_motion()
@@ -394,24 +400,28 @@ def gesture(chatmode, photomode, exitmode, frame, barcodeData, objdetect, llm_ch
                 ###### for photo
                 if photomode == True:
                     #全画面のスクリーンショットを撮る
-                    photofile = 'photo/' + d.strftime('%Y%m%d_%H%M%S') + barcodeData + '.png'
+                    photofile = 'photo/' + d.strftime('%Y%m%d_%H%M%S_') + barcodeData + '.png'
                     pyautogui.screenshot(photofile)
                     objdetect.back()
                     photomode = False
                     print('photomode:False')
                     #フォトモード中の表示を消す
                     send_receive_server.send_utterance(url, '', '0', '', '')
+                    #チャットモード終了
+                    chatmode, intent, val = close_chatmode(chatmode, cls_chat, llm_chat, url)
                 ###### for photo
 
-        if h_gesture == hand_gesture.H_THUMBS_DOWN:
+        if exitmode == False and h_gesture == hand_gesture.H_THUMBS_DOWN:
             #システム終了
             talk.read_text('あいさつユニット終了します。よろしいですか？')
             #チャットモード抑制
             chatmode = False
-            llm_chat.end()
-            cls_chat.begin()
+            print('chatmode:False')
             #クラスタースレッドリセット
             cls_chat.reset_user_intent()
+            #チャットモード終了
+            chatmode, intent, val = close_chatmode(chatmode, cls_chat, llm_chat, url)
+
             exitmode = True
 
     return chatmode, photomode, exitmode
@@ -438,7 +448,6 @@ def greeting_main(url, mode = 0):
     
     # チャット
     llm_chat = LLM_chat.chat(LLM_chat.SPEECH_RECOGNITION_VOSK, LLM_chat.LLM_ELYZA)
-    llm_chat.end()
     chatmode = False
     print('chatmode:False')
     message = old_message = ''
@@ -485,7 +494,7 @@ def greeting_main(url, mode = 0):
 
         #フォト
         photomode, phototime, barcodeData, chatmode, intent, val \
-        = photo(chatmode, photomode, exitmode, phototime, frame, cls_chat, llm_chat, objdetect, intent, val, url)
+        = photo(chatmode, photomode, exitmode, phototime, frame, cls_chat, llm_chat, objdetect, intent, val, barcodeData, url)
 
         #チャット
         chatmode, exitmode, text, old_text, message, old_message, response, old_response, intent, val, exit \

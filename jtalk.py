@@ -15,6 +15,7 @@ def jtalk(t):
 
     #convert text encodeing from utf-8 to shift-jis
     try:
+        t = t.replace('～', 'ー')
         c.stdin.write(t.encode('shift-jis'))
         c.stdin.close()
         c.wait()
