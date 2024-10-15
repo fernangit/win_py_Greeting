@@ -12,8 +12,8 @@ if %R%==0 (
 timeout /t 5 > nul
 start "" E:\work\win_py_Greeting\venv\Scripts\python.exe E:\work\webGL_Greeting\WebGL\startServer.py
 timeout /t 5 > nul
-start "" microsoft-edge:http://localhost:5000
-timeout /t 5 > nul
+rem start "" microsoft-edge:http://localhost:5000
+rem timeout /t 5 > nul
 cd E:\work\win_py_Greeting
 rem start "" E:\work\win_py_Greeting\venv\Scripts\python.exe E:\work\win_py_Greeting\julius_server.py
 rem timeout /t 1 > nul

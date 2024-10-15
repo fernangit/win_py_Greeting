@@ -1,5 +1,5 @@
-start "" taskkill /im msedge.exe
+start "" taskkill /f /im msedge.exe
 timeout /t 1 > nul
-start "" taskkill /im python.exe
+start "" taskkill /f /im python.exe
 timeout /t 1 > nul
-start "" taskkill /im unisrve.exe
+start "" taskkill /f /im unisrve.exe

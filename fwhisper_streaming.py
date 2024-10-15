@@ -16,8 +16,8 @@ WAVE_OUTPUT_FILENAME = "output.wav"
 
 class FWhisper:
     def init(self):
-        # model_size = "large-v3"
-        model_size = "small"
+        model_size = "large-v3"
+        #model_size = "small"
 
         # Run on GPU with FP16
         model = WhisperModel(model_size, device="cuda", compute_type="float16")
@@ -41,6 +41,8 @@ class FWhisper:
                 print("録音終了")
         except:
             print('mic error')
+            # 音声認識の初期化
+            self.recognizer = sr.Recognizer()            
 
     def recording(self, output):
         # 音声データをwavファイルに保存

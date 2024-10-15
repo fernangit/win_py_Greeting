@@ -3,6 +3,8 @@ from datetime import datetime
 import time
 import random
 import copy
+import subprocess
+import os
 
 import cv2 as cv
 import numpy as np
@@ -22,6 +24,7 @@ import CLS_chat
 import read_code
 import object_detection_mp
 #import object_detection_rembg
+import selenium_ctrl
 
 #face recognition mode
 FACE_RECOGNITION_FACENET = 0
@@ -426,9 +429,18 @@ def gesture(chatmode, photomode, exitmode, frame, barcodeData, objdetect, llm_ch
 
     return chatmode, photomode, exitmode
 
+#終了関数
+def close():
+    # バッチファイルのパスを指定
+    batch_file_path = os.getcwd() + "/killMAU.bat"
+
+    # バッチファイルを実行
+    result = subprocess.run([batch_file_path], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)    
+
 #挨拶メイン関数
-def greeting_main(url, mode = 0):
-    #サーバ起動済み＆WebGL起動済みであること
+def greeting_main(url, browser, mode = 0):
+    #サーバ起動済みであること
+    selenium_ctrl.open_browser(browser)
 
     #時刻初期化
     nxt_h, nxt_m, t_st = initialize_time()
@@ -502,6 +514,7 @@ def greeting_main(url, mode = 0):
         if exit == True:
             cls_chat.kill()
             llm_chat.kill()
+            selenium_ctrl.close_browser()
             return
 
         #挨拶
@@ -526,5 +539,5 @@ if __name__ == '__main__':
     #     greeting_main(url, int(args[2]))
     # else:
     #     print('Arguments are too short')
-    greeting_main('http://localhost:8000/StreamingAssets/Utterance', 1)
+    greeting_main('http://localhost:8000/StreamingAssets/Utterance', 'http://localhost:5000', 1)
 
