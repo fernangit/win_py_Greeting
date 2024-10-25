@@ -18,7 +18,7 @@ cd E:\work\win_py_Greeting
 rem start "" E:\work\win_py_Greeting\venv\Scripts\python.exe E:\work\win_py_Greeting\julius_server.py
 rem timeout /t 1 > nul
 start "" E:\work\win_py_Greeting\venv\Scripts\python.exe E:\work\win_py_Greeting\Greeting_w_v1.py
-timeout /t 10 > nul
-E:\work\win_py_Greeting\activate.vbs msedge.exe
-timeout /t 5 > nul
-E:\work\win_py_Greeting\venv\Scripts\python.exe E:\work\win_py_Greeting\browserMaximize.py
+rem timeout /t 10 > nul
+rem E:\work\win_py_Greeting\activate.vbs msedge.exe
+rem timeout /t 5 > nul
+rem E:\work\win_py_Greeting\venv\Scripts\python.exe E:\work\win_py_Greeting\browserMaximize.py

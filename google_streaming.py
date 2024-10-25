@@ -17,7 +17,7 @@ def get_message():
 
     user_message = r.recognize_google(audio, language='ja-JP')
 
-    return user_message
+    return user_message, '', 0.0
 
 if __name__ == '__main__':
     print('音声認識開始')

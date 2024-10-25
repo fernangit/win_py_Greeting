@@ -24,6 +24,8 @@ class clsChat():
         self.user_intent = ''
         self.val = 0.0
         self.user_message = ''
+        self.lang = ''
+        self.probability = 0.0
 
         self.thread = threading.Thread(target=self.cls_sentence_thread)
         self.thread.start()
@@ -66,9 +68,9 @@ class clsChat():
 
     def cls_chat(self):
         try:
-            self.user_message = self.speech_model.get_message(self.speech_ret)
+            self.user_message, self.lang, self.probability = self.speech_model.get_message(self.speech_ret)
+            print(f'cls_user_message={self.user_message}, lang={self.lang}, prob={self.probability}')
             label, val = text_classification.get_label(self.user_message)
-            print('cls_user_message=', self.user_message)
             print(label, val)
         except:
             label = ''

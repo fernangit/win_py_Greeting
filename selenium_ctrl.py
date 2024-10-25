@@ -2,15 +2,16 @@
 from selenium import webdriver 
 from selenium.webdriver.edge.service import Service
 from selenium.webdriver.edge.options import Options
-from msedge.selenium_tools import Edge, EdgeOptions
-
 import os
 
 path = os.getcwd()
+#「Microsoft Edgeは自動テストソフトウェアによって制御されています」を消す
+# installed selenium-4.15.2
 service = Service(executable_path=path + "/msedgedriver.exe")
 options = Options()
 options.use_chromium = True
 options.add_experimental_option("excludeSwitches", ['enable-automation'])
+
 # Initialize Edge WebDriver
 driver = webdriver.Edge(service=service, options=options)
 

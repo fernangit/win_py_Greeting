@@ -1,6 +1,7 @@
 import cv2
 import time
 import numpy as np
+import os
 
 MODE = "MPI"
 
@@ -15,7 +16,6 @@ elif MODE == "MPI" :
     weightsFile = "pose/mpi/pose_iter_160000.caffemodel"
     nPoints = 15
     POSE_PAIRS = [[0,1], [1,2], [2,3], [3,4], [1,5], [5,6], [6,7], [1,14], [14,8], [8,9], [9,10], [14,11], [11,12], [12,13] ]
-
 
 inWidth = 368
 inHeight = 368

@@ -30,7 +30,7 @@ def get_message():
     for word in filter(bool, extracted_word.findall(data)):
         user_message += word
 
-    return user_message
+    return user_message, '', 0.0
 
 if __name__ == '__main__':
     print('音声認識開始')

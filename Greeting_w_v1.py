@@ -25,6 +25,7 @@ import read_code
 import object_detection_mp
 #import object_detection_rembg
 import selenium_ctrl
+import browserMaximize
 
 #face recognition mode
 FACE_RECOGNITION_FACENET = 0
@@ -271,7 +272,7 @@ def photo(chatmode, photomode, exitmode, phototime, frame, cls_chat, llm_chat, o
     return photomode, phototime, barcodeData, chatmode, intent, val
 
 #チャット
-def chat(chatmode, exitmode, cls_chat, llm_chat, text, old_text, message, old_message, response, old_response, intent, val, url):
+def chat(chatmode, exitmode, exittime, cls_chat, llm_chat, text, old_text, message, old_message, response, old_response, intent, val, url):
     exit = False
     #classification
     intent, val, text = cls_chat.get_user_intent()
@@ -325,13 +326,13 @@ def chat(chatmode, exitmode, cls_chat, llm_chat, text, old_text, message, old_me
             print('finished')
             talk.read_text('あいさつユニット終了します')
             exit = True
-        elif val > 6.5 and intent != '':
+        elif (val > 6.5 and intent != '') or ((time.time() - exittime) > 10) :
             talk.read_text('あいさつユニット継続します')
             exitmode = False
             #チャットモード終了
             chatmode, intent, val = close_chatmode(chatmode, cls_chat, llm_chat, url)
 
-    return chatmode, exitmode, text, old_text, message, old_message, response, old_response, intent, val, exit
+    return chatmode, exitmode, exittime, text, old_text, message, old_message, response, old_response, intent, val, exit
 
 #チャットモード終了
 def close_chatmode(chatmode, cls_chat, llm_chat, url):
@@ -379,7 +380,7 @@ def greet(chatmode, photomode, exitmode, t_st, frame, hasFrame, face_model, mode
     return t_st
 
 #ジェスチャ
-def gesture(chatmode, photomode, exitmode, frame, barcodeData, objdetect, llm_chat, cls_chat, d, url):
+def gesture(chatmode, photomode, exitmode, exittime, frame, barcodeData, objdetect, llm_chat, cls_chat, d, url):
     if exitmode == False:
         #OK gesture
         h_gesture = hand_gesture.detect_hand_gesture(frame)
@@ -426,8 +427,10 @@ def gesture(chatmode, photomode, exitmode, frame, barcodeData, objdetect, llm_ch
             chatmode, intent, val = close_chatmode(chatmode, cls_chat, llm_chat, url)
 
             exitmode = True
+            exittime = time.time()
 
-    return chatmode, photomode, exitmode
+
+    return chatmode, photomode, exitmode, exittime
 
 #終了関数
 def close():
@@ -439,8 +442,11 @@ def close():
 
 #挨拶メイン関数
 def greeting_main(url, browser, mode = 0):
+    #ブラウザ起動
     #サーバ起動済みであること
     selenium_ctrl.open_browser(browser)
+    time.sleep(5)
+    browserMaximize.do()
 
     #時刻初期化
     nxt_h, nxt_m, t_st = initialize_time()
@@ -448,24 +454,17 @@ def greeting_main(url, browser, mode = 0):
     #デバイス初期設定
     cap = initialize_devices(0)
     
-    #モデル選択
+    #モデル初期化
     face_model = initialize_model(FACE_RECOGNITION_INSIGHTFACE)
 
-    #起動セリフ＆モーション
-    opening()
-    time.sleep(7)
-    
-    #読み上げ開始
-#    talk.read_sentence()
-    
-    # チャット
+    # チャット初期化
     llm_chat = LLM_chat.chat(LLM_chat.SPEECH_RECOGNITION_VOSK, LLM_chat.LLM_ELYZA)
     chatmode = False
     print('chatmode:False')
     message = old_message = ''
     response = old_response = ''
     
-    # 意図抽出
+    # 意図抽出初期化
     cls_chat = CLS_chat.clsChat(CLS_chat.SPEECH_RECOGNITION_VOSK)
     cls_chat.begin()
     text = old_text = ''
@@ -478,16 +477,26 @@ def greeting_main(url, browser, mode = 0):
     phototime = time.time()
     barcodeData = ''
 
-    #スプラッシュスクリーン
+    #スプラッシュスクリーン初期化
 #    pcap = cv.VideoCapture(1) #別カメラ使用
     pcap = cap
     objdetect = object_detection_mp.ObjectDetection(pcap)
 #    objdetect = object_detection_rembg.ObjectDetection(pcap)
     objdetect.back()
 
+    #終了モード初期化
     exitmode = False
+    exittime = time.time()
+
+    #起動セリフ＆モーション
+    opening()
+    time.sleep(7)
+    
+    #読み上げ開始
+#    talk.read_sentence()
 
     while True:
+        #エラーになるときは、opencv-pythonをアンインストール、再インストール
         cv.waitKey(1)
         
         #現在時刻読み取り
@@ -509,8 +518,8 @@ def greeting_main(url, browser, mode = 0):
         = photo(chatmode, photomode, exitmode, phototime, frame, cls_chat, llm_chat, objdetect, intent, val, barcodeData, url)
 
         #チャット
-        chatmode, exitmode, text, old_text, message, old_message, response, old_response, intent, val, exit \
-        = chat(chatmode, exitmode, cls_chat, llm_chat, text, old_text, message, old_message, response, old_response, intent, val, url)
+        chatmode, exitmode, exittime, text, old_text, message, old_message, response, old_response, intent, val, exit \
+        = chat(chatmode, exitmode, exittime, cls_chat, llm_chat, text, old_text, message, old_message, response, old_response, intent, val, url)
         if exit == True:
             cls_chat.kill()
             llm_chat.kill()
@@ -521,7 +530,7 @@ def greeting_main(url, browser, mode = 0):
         t_st = greet(chatmode, photomode, exitmode, t_st, frame, hasFrame, face_model, mode, d, url)
 
         #ジェスチャ
-        chatmode, photomode, exitmode = gesture(chatmode, photomode, exitmode, frame, barcodeData, objdetect, llm_chat, cls_chat, d, url)        
+        chatmode, photomode, exitmode, exittime = gesture(chatmode, photomode, exitmode, exittime, frame, barcodeData, objdetect, llm_chat, cls_chat, d, url)        
 
         #debug
         frame = correct_frame(frame) #入力フレーム補正

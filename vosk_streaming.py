@@ -29,7 +29,6 @@ from collections import namedtuple
 import sounddevice as sd
 from vosk import KaldiRecognizer, Model, SetLogLevel
 
-
 class MicrophoneStream:
     """マイク音声入力のためのクラス."""
 
@@ -142,7 +141,7 @@ def get_message(vosk_asr):
         if recog_result != '':
             break
 
-    return recog_result
+    return recog_result, '', 0.0
 
 def main(chunk_size=8000):
     """音声認識デモンストレーションを実行.

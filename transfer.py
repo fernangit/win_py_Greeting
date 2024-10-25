@@ -40,7 +40,7 @@ def transfer_utterance(utterance):
             key = bkey
 
         keyinp.send(key)
-        time.sleep(0.1)
+        time.sleep(0.15)
         bkey = key
     talkend = True
 

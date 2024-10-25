@@ -2,11 +2,14 @@ import sys
 import random
 import time
 import jtalk
+import etalk
 import utterance
 import transfer
 import threading
 import glob
 import os
+
+#言語モード 0:日本語, 1:英語
 
 #起動時
 def opening():
@@ -82,9 +85,9 @@ def read_sentence_file(sentence_file):
         with open(sentence_file, encoding="utf-8") as f:
             read_text(f.read())
 
-def read_text(text):
+def read_text(text, mode=0):
     print(text)
-    talk(text)
+    talk(text, mode)
     #モーションズレ補正
     time.sleep(0.2)
     #口パク
@@ -96,13 +99,19 @@ def read_text(text):
         time.sleep(1)
 
 #発話
-def talk(sentence):
+def talk(sentence, mode=0):
     #発話再生
-    thread = threading.Thread(args=(sentence, ), target = jtalk_thread)
+    if mode == 0:
+        thread = threading.Thread(args=(sentence, ), target = jtalk_thread)
+    else:
+        thread = threading.Thread(args=(sentence, ), target = etalk_thread)
     thread.start()
 
 def jtalk_thread(sentence):
     jtalk.jtalk(sentence)
+
+def etalk_thread(sentence):
+    etalk.etalk(sentence)
 
 def percentage_to_level(per, thresh, motion_num):
     return transfer.transfer_percentage(per, thresh, motion_num)
@@ -132,5 +141,10 @@ if __name__ == '__main__':
 #        speak(args[1])
 #    else:
 #        print('Arguments are too short')
-    read_sentence()
-
+#    read_sentence()
+    while(True):
+        text = input('?(qで終了):')
+        if text == 'q' or text == 'Q':
+            print('finished')
+            break
+        read_text(text)

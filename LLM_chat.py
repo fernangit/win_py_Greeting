@@ -34,6 +34,8 @@ class chat():
         self.llm_model.import_lib()
 
         self.user_message = ''
+        self.lang = ''
+        self.probability = 0.0
         self.response = ''
         self.mesbefore = ''
         self.resbefore = ''
@@ -106,7 +108,7 @@ class chat():
         self.response = self.resbefore
         try:
             self.data = ''
-            self.user_message = self.speech_model.get_message(self.speech_ret)
+            self.user_message, self.lang, self.probability = self.speech_model.get_message(self.speech_ret)
             print('llm_user_message=', self.user_message)
             self.filler = threading.Thread(target=self.chat_filler_thread)
             self.filler.start()
