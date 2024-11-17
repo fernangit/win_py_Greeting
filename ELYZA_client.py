@@ -20,7 +20,8 @@ class ELYZA_clt:
         atexit.register(self.memorize)
     
     def llm_response(self, def_prompt, text):
-        output = self.base_response(def_prompt, text)
+#        output = self.ELYZA_srv.base_response(def_prompt, text)
+        output = self.send_receive(url, def_prompt, text)
         print (output)
         return output
 

@@ -19,6 +19,7 @@ import regist_detected
 import send_receive_server
 import image_filter
 import hand_gesture
+import hand_mouse
 import LLM_chat
 import CLS_chat
 import read_code
@@ -513,6 +514,9 @@ def greeting_main(url, browser, mode = 0):
             cap = initialize_devices(0)
             continue
 
+        #ハンドマウス
+        hand_mouse.detect_hand_mouse(frame)
+        
         #フォト
         photomode, phototime, barcodeData, chatmode, intent, val \
         = photo(chatmode, photomode, exitmode, phototime, frame, cls_chat, llm_chat, objdetect, intent, val, barcodeData, url)
@@ -530,7 +534,7 @@ def greeting_main(url, browser, mode = 0):
         t_st = greet(chatmode, photomode, exitmode, t_st, frame, hasFrame, face_model, mode, d, url)
 
         #ジェスチャ
-        chatmode, photomode, exitmode, exittime = gesture(chatmode, photomode, exitmode, exittime, frame, barcodeData, objdetect, llm_chat, cls_chat, d, url)        
+        chatmode, photomode, exitmode, exittime = gesture(chatmode, photomode, exitmode, exittime, frame, barcodeData, objdetect, llm_chat, cls_chat, d, url)
 
         #debug
         frame = correct_frame(frame) #入力フレーム補正

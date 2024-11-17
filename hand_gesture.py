@@ -10,9 +10,11 @@ H_THUMBS_UP = 1
 H_THUMBS_DOWN = 2
 H_PAPER = 3
 H_PEACE = 4
+H_SABARA = 5
+H_GUWASHI = 6
 
-fingertop = [5, 9, 13, 17, 21]
-fingerbot = [3, 6, 10, 14, 18]
+fingertop = [5, 9, 13, 17, 21] #親指、人差し指、中指、薬指、小指
+fingerbot = [3, 6, 10, 14, 18] #親指、人差し指、中指、薬指、小指
 thumbs = [2, 3, 4, 5]
 parm = 1
 
@@ -79,10 +81,42 @@ def detect_peace(hand):
     for i in range(2):
         if hand[fingertop[i+1]-1][1] > hand[fingerbot[i+1]-1][1]:
             return False
-    #薬指、小指の指先が第三関節より上
+    #薬指、小指の指先が第三関節より下
     for i in range(2):
         if hand[fingertop[i+3]-1][1] < hand[fingerbot[i+3]-1][1]:
             return False
+    
+    return True
+
+#サバラ
+def detect_sabara(hand):
+    #人差し指の指先が第三関節より上
+    if hand[fingertop[1]-1][1] > hand[fingerbot[1]-1][1]:
+        return False
+    #小指の指先が第三関節より上
+    if hand[fingertop[4]-1][1] > hand[fingerbot[4]-1][1]:
+        return False
+    #中指、薬指の指先が第三関節より下
+    for i in range(2):
+        if hand[fingertop[i+2]-1][1] < hand[fingerbot[i+2]-1][1]:
+            return False
+    
+    return True
+
+#グワシ
+def detect_guwashi(hand):
+    #人差し指の指先が第三関節より上
+    if hand[fingertop[1]-1][1] > hand[fingerbot[1]-1][1]:
+        return False
+    #薬指の指先が第三関節より上
+    if hand[fingertop[3]-1][1] > hand[fingerbot[3]-1][1]:
+        return False
+    #中指の指先が第三関節より下
+    if hand[fingertop[2]-1][1] < hand[fingerbot[2]-1][1]:
+        return False
+    #小指の指先が第三関節より下
+    if hand[fingertop[4]-1][1] < hand[fingerbot[4]-1][1]:
+        return False
     
     return True
 
@@ -134,6 +168,12 @@ def detect_hand_gesture(img):
                 elif detect_peace(p[hl]) == True:
                     print('peace!')
                     return H_PEACE
+                elif detect_sabara(p[hl]) == True:
+                    print('sabara!')
+                    return H_SABARA
+                elif detect_guwashi(p[hl]) == True:
+                    print('guwashi!')
+                    return H_GUWASHI
 
     return H_NO_GESTURE
 

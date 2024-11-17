@@ -119,4 +119,4 @@ if __name__ == '__main__':
     # port = sys.argv[2]
 
     # startServer(url, port)
-    startServer('192.168.0.104', '8000')
+    startServer('127.0.0.1', '8000')

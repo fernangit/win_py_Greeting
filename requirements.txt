@@ -1,115 +1,228 @@
-absl-py==2.0.0
-accelerate==0.24.1
-albumentations==1.3.1
-asttokens==2.4.1
-attrs==23.1.0
-bitsandbytes==0.41.1
-certifi==2023.11.17
-cffi==1.16.0
-charset-normalizer==3.3.2
-colorama==0.4.6
-coloredlogs==15.0.1
-comm==0.2.2
-contourpy==1.2.0
-cycler==0.12.1
-Cython==3.0.7
-debugpy==1.8.1
-decorator==5.1.1
-dlib==19.24.2
-easydict==1.11
-exceptiongroup==1.2.0
-executing==2.0.1
-facenet-pytorch==2.5.3
-filelock==3.13.1
-flatbuffers==23.5.26
-fonttools==4.45.1
-fsspec==2023.10.0
-fugashi==1.3.1
-huggingface-hub==0.19.4
-humanfriendly==10.0
-idna==3.5
-imageio==2.33.1
-insightface==0.7.3
-ipadic==1.0.0
-ipykernel==6.29.3
-ipython==8.22.2
-jedi==0.19.1
-Jinja2==3.1.2
-joblib==1.3.2
-jupyter_client==8.6.1
-jupyter_core==5.7.2
-kiwisolver==1.4.5
-lazy_loader==0.3
-MarkupSafe==2.1.3
-matplotlib==3.8.2
-matplotlib-inline==0.1.6
-mecab-python3==1.0.8
-mediapipe==0.10.8
-MouseInfo==0.1.3
-mpmath==1.3.0
-nest-asyncio==1.6.0
-networkx==3.2.1
-numpy==1.26.2
-onnx==1.15.0
-onnxruntime==1.16.3
-opencv-contrib-python==4.8.1.78
-opencv-python==4.8.1.78
-opencv-python-headless==4.8.1.78
-packaging==23.2
-parso==0.8.3
-Pillow==10.1.0
-plac==1.4.3
-platformdirs==4.2.0
-prettytable==3.9.0
-prompt-toolkit==3.0.43
-protobuf==3.20.3
-psutil==5.9.6
-pure-eval==0.2.2
-PyAudio==0.2.14
-PyAutoGUI==0.9.54
-pycparser==2.21
-PyGetWindow==0.0.9
-Pygments==2.17.2
-PyMsgBox==1.0.9
-pyparsing==3.1.1
-pyperclip==1.8.2
-pyreadline3==3.4.1
-PyRect==0.2.0
-PyScreeze==0.1.30
-python-dateutil==2.8.2
-pytweening==1.0.7
-pywin32==306
-PyYAML==6.0.1
-pyzmq==25.1.2
-qudida==0.0.4
-regex==2023.10.3
-requests==2.31.0
-safetensors==0.4.0
-scikit-image==0.22.0
-scikit-learn==1.3.2
-scipy==1.11.4
-sentencepiece==0.1.99
-six==1.16.0
-sounddevice==0.4.6
-SpeechRecognition==3.10.0
-srt==3.5.3
-stack-data==0.6.3
-sympy==1.12
-threadpoolctl==3.2.0
-tifffile==2023.12.9
-tokenizers==0.15.0
-torch==2.0.0+cu118
-torchaudio==2.0.1
-torchvision==0.15.1
-tornado==6.4
-tqdm==4.66.1
-traitlets==5.14.2
-transformers==4.35.2
-typing_extensions==4.8.0
-unidic==1.1.0
-unidic-lite==1.0.8
-urllib3==2.1.0
-vosk==0.3.45
-wasabi==0.10.1
-wcwidth==0.2.12
-websockets==12.0
+Package                  Version
+------------------------ ------------
+absl-py                  2.1.0
+accelerate               1.0.1
+aiohappyeyeballs         2.4.3
+aiohttp                  3.10.10
+aiosignal                1.3.1
+albucore                 0.0.19
+albumentations           1.4.19
+annotated-types          0.7.0
+antlr4-python3-runtime   4.8
+anyio                    4.6.2.post1
+async-timeout            4.0.3
+attrs                    24.2.0
+audioread                3.0.1
+av                       12.3.0
+babel                    2.16.0
+backoff                  2.2.1
+beautifulsoup4           4.12.3
+bitarray                 3.0.0
+bitsandbytes             0.44.1
+blinker                  1.8.2
+certifi                  2024.8.30
+cffi                     1.17.1
+chardet                  5.2.0
+charset-normalizer       3.4.0
+click                    8.1.7
+colorama                 0.4.6
+coloredlogs              15.0.1
+comtypes                 1.4.8
+configparser             7.1.0
+contourpy                1.3.0
+courlan                  1.3.1
+crayons                  0.4.0
+cryptography             43.0.3
+ctranslate2              4.5.0
+cycler                   0.12.1
+Cython                   3.0.11
+dataclasses-json         0.6.7
+dateparser               1.2.0
+decorator                5.1.1
+dlib                     19.24.6
+easydict                 1.13
+emoji                    2.14.0
+eval_type_backport       0.2.0
+exceptiongroup           1.2.2
+fairseq                  0.12.2
+faiss-cpu                1.7.3
+fastapi                  0.115.3
+faster-whisper           1.0.3
+ffmpeg-python            0.2.0
+filelock                 3.13.1
+filetype                 1.2.0
+Flask                    3.0.3
+flatbuffers              24.3.25
+fonttools                4.54.1
+frozenlist               1.5.0
+fsspec                   2024.2.0
+fugashi                  1.3.2
+future                   1.0.0
+greenlet                 3.1.1
+h11                      0.14.0
+html5lib                 1.1
+htmldate                 1.9.1
+httpcore                 1.0.6
+httpx                    0.27.2
+huggingface-hub          0.26.1
+humanfriendly            10.0
+hydra-core               1.0.7
+idna                     3.10
+imageio                  2.36.0
+insightface              0.7.3
+ipadic                   1.0.0
+itsdangerous             2.2.0
+jax                      0.4.35
+jaxlib                   0.4.35
+Jinja2                   3.1.3
+joblib                   1.4.2
+jsonpatch                1.33
+jsonpath-python          1.0.6
+jsonpointer              3.0.0
+jusText                  3.0.1
+keyboard                 0.13.5
+kiwisolver               1.4.7
+langchain                0.3.4
+langchain-community      0.3.3
+langchain-core           0.3.12
+langchain-huggingface    0.1.0
+langchain-text-splitters 0.3.0
+langdetect               1.0.9
+langsmith                0.1.137
+lazy_loader              0.4
+libmagic                 1.0
+librosa                  0.10.2.post1
+llvmlite                 0.43.0
+loguru                   0.7.2
+lxml                     5.3.0
+lxml_html_clean          0.3.1
+MarkupSafe               2.1.5
+marshmallow              3.23.0
+matplotlib               3.9.2
+mediapipe                0.10.14
+ml_dtypes                0.5.0
+MouseInfo                0.1.3
+mpmath                   1.3.0
+msgpack                  1.1.0
+multidict                6.1.0
+mypy-extensions          1.0.0
+nest-asyncio             1.6.0
+networkx                 3.2.1
+nltk                     3.9.1
+numba                    0.60.0
+numpy                    1.23.5
+olefile                  0.47
+omegaconf                2.0.6
+onnx                     1.17.0
+onnxruntime              1.19.2
+opencv-contrib-python    4.10.0.84
+opencv-python            4.10.0.84
+opencv-python-headless   4.10.0.84
+opt_einsum               3.4.0
+orjson                   3.10.10
+outcome                  1.3.0.post0
+packaging                24.1
+pillow                   10.2.0
+pip                      21.2.3
+platformdirs             4.3.6
+pooch                    1.8.2
+portalocker              2.10.1
+praat-parselmouth        0.4.5
+prettytable              3.11.0
+propcache                0.2.0
+protobuf                 4.25.5
+psutil                   6.1.0
+PyAudio                  0.2.14
+PyAutoGUI                0.9.54
+pycparser                2.22
+pydantic                 2.9.2
+pydantic_core            2.23.4
+pydantic-settings        2.6.0
+PyGetWindow              0.0.9
+PyMsgBox                 1.0.9
+pyparsing                3.2.0
+pypdf                    5.0.1
+pyperclip                1.9.0
+pypiwin32                223
+pyreadline3              3.5.4
+PyRect                   0.2.0
+PyScreeze                1.0.1
+PySocks                  1.7.1
+python-dateutil          2.8.2
+python-dotenv            1.0.1
+python-iso639            2024.10.22
+python-magic-bin         0.4.14
+python-multipart         0.0.12
+python-oxmsg             0.0.1
+python-pptx              1.0.2
+pyttsx3                  2.98
+pytweening               1.2.0
+pytz                     2024.2
+pywin32                  308
+pyworld                  0.3.4
+PyYAML                   6.0.2
+pyzbar                   0.1.9
+RapidFuzz                3.10.0
+regex                    2024.9.11
+requests                 2.32.3
+requests-toolbelt        1.0.0
+resampy                  0.4.3
+rvc-python               0.1.4
+sacrebleu                2.4.3
+safetensors              0.4.5
+scikit-image             0.24.0
+scikit-learn             1.5.2
+scipy                    1.14.1
+selenium                 4.15.2
+selenium-tools           0.0.2
+sentence-transformers    3.2.1
+setuptools               57.4.0
+six                      1.16.0
+sniffio                  1.3.1
+sortedcontainers         2.4.0
+sounddevice              0.5.1
+soundfile                0.12.1
+soupsieve                2.6
+soxr                     0.5.0.post1
+SpeechRecognition        3.11.0
+SQLAlchemy               2.0.36
+srt                      3.5.3
+starlette                0.41.0
+stringzilla              3.10.5
+sympy                    1.13.1
+tabulate                 0.9.0
+tenacity                 9.0.0
+tensorboardX             2.6.2.2
+threadpoolctl            3.5.0
+tifffile                 2024.9.20
+tld                      0.13
+tokenizers               0.20.1
+torch                    2.5.0+cu118
+torchaudio               2.5.0+cu118
+torchcrepe               0.0.23
+torchvision              0.20.0+cu118
+tqdm                     4.66.5
+trafilatura              1.12.2
+transformers             4.45.2
+trio                     0.27.0
+trio-websocket           0.11.1
+typing_extensions        4.9.0
+typing-inspect           0.9.0
+tzdata                   2024.2
+tzlocal                  5.2
+unstructured             0.16.1
+unstructured-client      0.26.1
+urllib3                  2.2.3
+uvicorn                  0.32.0
+vosk                     0.3.45
+wcwidth                  0.2.13
+webdriver-manager        3.4.2
+webencodings             0.5.1
+websocket-client         1.8.0
+websockets               13.1
+Werkzeug                 3.0.5
+win32-setctime           1.1.0
+wrapt                    1.16.0
+wsproto                  1.2.0
+XlsxWriter               3.2.0
+yarl                     1.16.0

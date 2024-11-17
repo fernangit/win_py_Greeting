@@ -1,7 +1,7 @@
 import keyboard
 
 #debug
-DEBUG = True
+DEBUG = False
 
 def send(key):
     if DEBUG != True:
