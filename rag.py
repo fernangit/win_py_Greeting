@@ -1,4 +1,4 @@
-#LangChainを使ったPAGElyzabを用いて試してみた
+#Lane Chainを使ったPAGElyzabを用いて試してみた
 #https://note.com/alexweberk/n/n3cffc010e9e9
 #https://nynupe! readthedocs, 10/ja/latest/rag himi
 #https://unstructuree-ie github.io/unstructured/bricks himitoartition potx
@@ -11,6 +11,7 @@ from langchain.schema import Document
 from langchain.schema.embeddings import Embeddings
 from langchain.storage import InMemoryStore
 from langchain.chains.summarize import load_summarize_chain
+from langchain_chroma import Chroma
 from langchain_community.document_loaders import DirectoryLoader
 from langchain_community.document_loaders import TextLoader, PyPDFLoader, JSONLoader, Docx2txtLoader, CSVLoader
 from langchain_community.document_loaders import UnstructuredFileLoader
@@ -21,7 +22,7 @@ from langchain_community.document_loaders import UnstructuredHTMLLoader
 from langchain_community.document_loaders import UnstructuredXMLLoader
 from langchain_community.document_loaders import UnstructuredMarkdownLoader
 from langchain_community.llms import HuggingFacePipeline
-from langchain_community.vectorstores import FAISS, Chroma
+from langchain_community.vectorstores import FAISS
 from langchain_community.vectorstores.utils import DistanceStrategy
 from langchain_core.prompts import PromptTemplate
 from langchain_huggingface import HuggingFaceEmbeddings
@@ -30,6 +31,11 @@ from langchain_text_splitters import TokenTextSplitter, CharacterTextSplitter, R
 import os
 from typing import Any
 import uuid
+
+class JapaneseCharacterTextSplitter(RecursiveCharacterTextSplitter):
+    def __init__(self, **kwargs: Any):
+        separators = ["\n\n", "\n", "。", "、", " ", ""]
+        super().__init__(separators=separators, **kwargs)
 
 #ローダー
 #https://www.ai-shift.co.jp/techblog/4037
@@ -144,47 +150,47 @@ def initialize_ParentDocumentRetriever(dbpath, commondir, privatedir):
 
     #フォルダからファイルをロードする
     documents = []
-    texts = []
     for loader in loaders_list:
-        #Use UnstructuredFileLoader to load each file
+        # Use UnstructuredFileLoader to load each file
+        # pip uninstall python-magic
+        # pip install python-magic-bin=0.4.14
+        # pip install python-pptx
         docs = loader.load()
-        for doc in docs:
-            texts.append(doc.page_content)
         documents.extend(docs)
+
+    #文書を細切れにするためのsplitter
+    # parent_splitter = RecursiveCharacterTextSplitter(chunk_size=2000)
+    # child_splitter = RecursiveCharacterTextSplitter(chunk_size=400)
+    parent_splitter = JapaneseCharacterTextSplitter(chunk_size=2000)
+    child_splitter = JapaneseCharacterTextSplitter(chunk_size=400)
 
     id_key = 'doc_id'
     #The vectorstore to use to index the child chunks
     #vectorstore = get_empty_faiss_vectorstore (embeddings, 1536)
-    vectorstore = Chroma(collection_name = 'multi_modal_rag', embedding_function = embeddings)
+    vectorstore = Chroma(collection_name="full_documents", embedding_function = embeddings)
     docstore = InMemoryStore()
 
-    #文書を細切れにするためのsplitter
-    child_splitter = RecursiveCharacterTextSplitter(chunk_size = 10, chunk_overlap = 0) 
-    #child_splitter = CharacterTextSplitter(separator='\n', chunk_size = 10, chunk_overlap = 0)
-
     #Retrieverを作成
-    retriever = ParentDocumentRetriever(vectorstore = vectorstore, docstore = docstore, child_splitter = child_splitter, id_key = id_key)
+    retriever = ParentDocumentRetriever(vectorstore = vectorstore, docstore = docstore, child_splitter = child_splitter, parent_splitter=parent_splitter, id_key = id_key)
 
     #Add texts
-    doc_ids = [str(uuid.uuid4()) for _ in texts]
-    for i, s in enumerate (texts):
-        retriever.vectorstore.add_documents([Document(page_content = s, metadata={id_key: doc_ids[i]})])
-    retriever.docstore.mset(list(zip(doc_ids, texts)))
-    return retriever
+    retriever.add_documents(documents, ids=None)
+
+    return retriever, vectorstore
  
 def create_context(retriever, text):
     #一致度
     found_docs = retriever.invoke(text)
     print(len(found_docs))
     context = '\n'.join([document.page_content for document in found_docs])
-#    print (context)
+    print (context)
     return context
 
-def create_context_ParentDocumentRetriever (retriever, text):
+def create_context_sub(vectorstore, text):
     #一致度
-    found_docs = retriever.get_relevant_documents(text)
+    found_docs = vectorstore.similarity_search(text)
     print(len(found_docs))
-    context = '\n'.Join([document for document in found_docs])
+    context = '\n'.join([document.page_content for document in found_docs])
     print (context)
     return context
 
@@ -276,3 +282,15 @@ def response (retriever, model, tokenizer, text):
     output = qa.invoke (text)
 
     return output 
+
+if __name__ == '__main__':
+    # retriever = initialize('./data/ppe.db', './data', './mem')
+    retriever, vectorstore = initialize_ParentDocumentRetriever('./data/ppe.db', './data', './mem')
+
+    while(True):
+        text = input('?(qで終了):')
+        if text == 'q' or text == 'Q':
+            print('finished')
+            break
+
+        context = create_context(retriever, text)

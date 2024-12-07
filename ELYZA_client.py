@@ -3,7 +3,6 @@ import mem
 import datetime
 import atexit
 import requests
-#import ELYZA_server
 
 #DEFAULT_SYSTEM_PROMPT = 'あなたの名前はまうです。あなたの年齢は20歳です。 受付をしている女性です。 特に指示が無い場合は、「まう」というキャラクターとして常に日本語で親しい間柄の感じで回答してください。\n'
 DEFAULT_SYSTEM_PROMPT2 = '以下のコンテキストも参照して回答してください。\nコンテキスト：'
@@ -13,15 +12,14 @@ class ELYZA_clt:
     def __init__(self):
         # self.ELYZA_srv = ELYZA_server.ELYZA_srv()        
         self.memory = mem.initialize(100)
-        self.retriever = rag.initialize('./data/ppe.db', './data', './mem')
-        #self.retriever = rag.initialize_ParentDocumentRetriever('./data/ppe.db', '/data',  '/mem')
+        # self.retriever = rag.initialize('./data/ppe.db', './data', './mem')
+        self.retriever, self.vectorstore = rag.initialize_ParentDocumentRetriever('./data/ppe.db', './data',  './mem')
 
         #終了時メモリ書き込みを登録
         atexit.register(self.memorize)
     
     def llm_response(self, def_prompt, text):
-#        output = self.ELYZA_srv.base_response(def_prompt, text)
-        output = self.send_receive(url, def_prompt, text)
+        output = self.base_response(def_prompt, text)
         print (output)
         return output
 
@@ -94,5 +92,5 @@ if __name__ == '__main__':
             print('finished')
             break
 #        r = llm_model.response('http://'+url+':'+port+'/Utterance', text)
-        r = llm_model.response('http://192.168.0.104:8000/Utterance', text)
+        r = llm_model.response('http://127.0.0.1:8000/Utterance', text)
 

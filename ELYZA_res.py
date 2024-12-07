@@ -46,8 +46,8 @@ class ELYZA:
         # thread.start()
 
         self.memory = mem.initialize(100)
-        self.retriever = rag.initialize('./data/ppe.db', './data', './mem')
-        #self.retriever = rag.initialize_ParentDocumentRetriever('./data/ppe.db', '/data',  '/mem')
+        # self.retriever = rag.initialize('./data/ppe.db', './data', './mem')
+        self.retriever, self.vectorstore = rag.initialize_ParentDocumentRetriever('./data/ppe.db', './data',  './mem')
 
         #終了時メモリ書き込みを登録
         atexit.register(self.memorize)
@@ -130,7 +130,6 @@ class ELYZA:
         #検索したコンテキストをプロンプトに設定する
         #context = rag.create_context(db, text)
         context = rag.create_context(retriever, output)
-        #context = rag.create_context_ParentDocumentRetriever(retriever. output)
         if context != '':
             def_prompt += (DEFAULT_SYSTEM_PROMPT2 + context + '\n')
 
