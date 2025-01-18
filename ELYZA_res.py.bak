@@ -8,9 +8,6 @@ import threading
 import datetime
 import atexit
 
-#曜日の名前をリストで定義
-WEEKDAYS = ['月曜日', '火曜日', '水曜日', '木曜日', '金曜日', '土曜日', '日曜日']
-
 DEFAULT_SYSTEM_PROMPT = 'あなたの名前はまうです。あなたの年齢は20歳です。 受付をしている女性です。 特に指示が無い場合は、「まう」というキャラクターとして常に日本語で親しい間柄のフレンドリーな感じで回答してください。\n'
 DEFAULT_SYSTEM_PROMPT2 = '以下のコンテキストも参照して回答してください。\nコンテキスト：'
 DEFAULT_SYSTEM_PROMPT3 = '以下の会話履歴も参考に回答してください。 \n会話：'
@@ -121,14 +118,10 @@ class ELYZA:
         return output
 
     def response_with_rag (self, memory, retriever, text):
-        today = datetime.datetime.today()
-        #曜日を取得
-        weekday = WEEKDAYS[today.weekday()]
-
         dt_now = datetime.datetime.now()
         tstr = dt_now.strftime('%Y年%m月%d日%H時%M分'.encode('unicode-escape').decode()).encode().decode('unicode-escape')
 
-        def_prompt = '現在時刻は' + tstr + weekday + ' です。'
+        def_prompt = '現在時刻は' + tstr + ' です。'
         def_prompt += DEFAULT_SYSTEM_PROMPT
 
         #Hyde クエリから仮の回答を作成して、それに似たドキュメントを検索する方法
