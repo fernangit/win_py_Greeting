@@ -7,6 +7,7 @@ import mem
 import threading
 import datetime
 import atexit
+import re
 
 #曜日の名前をリストで定義
 WEEKDAYS = ['月曜日', '火曜日', '水曜日', '木曜日', '金曜日', '土曜日', '日曜日']
@@ -23,10 +24,10 @@ quantization_config = BitsAndBytesConfig(
     bnb_4bit_compute_dtype= torch.bfloat16,    
 )
 
-class ELYZA:
+class DEEPSEEK:
     def __init__(self):
-        #https://huggingface.co/elyza/Llama-3-ELYZA-JP-8B
-        self.model_name = 'elyza/Llama-3-ELYZA-JP-8B'
+        #https://huggingface.co/cyberagent/DeepSeek-R1-Distill-Qwen-14B-Japanese
+        self.model_name = 'cyberagent/DeepSeek-R1-Distill-Qwen-14B-Japanese'
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
         self.model = AutoModelForCausalLM.from_pretrained(
             self.model_name,
@@ -152,6 +153,20 @@ class ELYZA:
 
         #回答を得る
         output = self.base_response(def_prompt, text)
+        #正規表現を使って<think>***</think>を取り除く
+        output = re.sub(r'<think>.*?</think>', '', output, flags=re.DOTALL)
+        #余計な部分を取り除く
+        output = re.sub(r'（補足.*$）', '', output, flags=re.DOTALL)
+        output = re.sub(r'（※.*$）', '', output, flags=re.DOTALL)
+        output = re.sub(r'\*\*根拠：\*\*.*$', '', output, flags=re.DOTALL)
+        output = re.sub(r'\*\*補足：\*\*.*$', '', output, flags=re.DOTALL)
+        output = output.replace('まう\n「', '')
+        output = output.replace('「', '')
+        output = output.replace('」', '')
+        output = output.replace('\*\*答え：\*\*', '')
+        output = output.replace('\*\*最終的な回答：\*\*', '')
+        #2行改行を1行にする
+        output = output.replace('\n\n', '\n')
         print (output)
 
         #メモリに書き込む
@@ -168,7 +183,7 @@ class ELYZA:
         mem.save(self.memory, './mem/memory.txt')
 
 if __name__ == '__main__':
-    llm_model = ELYZA()
+    llm_model = DEEPSEEK()
     while(True):
         text = input('?(qで終了):')
         if text == 'q' or text == 'Q':
