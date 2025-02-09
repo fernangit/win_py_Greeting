@@ -105,7 +105,7 @@ if __name__ == '__main__':
     # url = sys.argv[1]
     # port = sys.argv[2]
 
-    llm_model = ELYZA_clt()
+    llm_model = chat_clt()
     while(True):
         text = input('?(qで終了):')
         if text == 'q' or text == 'Q':
