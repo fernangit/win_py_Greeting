@@ -27,6 +27,7 @@ from langchain_community.vectorstores.utils import DistanceStrategy
 from langchain_core.prompts import PromptTemplate
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_text_splitters import TokenTextSplitter, CharacterTextSplitter, RecursiveCharacterTextSplitter
+import configparser
 
 import os
 from typing import Any
@@ -284,8 +285,17 @@ def response (retriever, model, tokenizer, text):
     return output 
 
 if __name__ == '__main__':
-    # retriever = initialize('./data/ppe.db', './data', './mem')
-    retriever, vectorstore = initialize_ParentDocumentRetriever('./data/ppe.db', './data', './mem')
+    # パスを設定ファイルから取得
+    config = configparser.ConfigParser()
+    config.read('settings.ini')
+
+    # 設定値の取得
+    dbpath = config['Directory']['DBPath']
+    commondir = config['Directory']['Common']
+    privatedir = config['Directory']['Private']
+
+    # retriever = initialize(dbpath, commondir, privatedir)
+    retriever, vectorstore = initialize_ParentDocumentRetriever(dbpath, commondir, privatedir)
 
     while(True):
         text = input('?(qで終了):')

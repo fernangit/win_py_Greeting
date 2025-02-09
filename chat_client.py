@@ -3,6 +3,7 @@ import mem
 import datetime
 import atexit
 import requests
+import configparser
 
 #曜日の名前をリストで定義
 WEEKDAYS = ['月曜日', '火曜日', '水曜日', '木曜日', '金曜日', '土曜日', '日曜日']
@@ -17,8 +18,18 @@ class chat_clt:
         self.memory = mem.initialize(100)
         self.memory.human_prefix = 'あなた'
         self.memory.ai_prefix = 'まう'
-        # self.retriever = rag.initialize('./data/ppe.db', './data', './mem')
-        self.retriever, self.vectorstore = rag.initialize_ParentDocumentRetriever('./data/ppe.db', './data',  './mem')
+
+        # パスを設定ファイルから取得
+        config = configparser.ConfigParser()
+        config.read('settings.ini')
+
+        # 設定値の取得
+        dbpath = config['Directory']['DBPath']
+        commondir = config['Directory']['Common']
+        privatedir = config['Directory']['Private']
+
+        # retriever = rag.initialize(dbpath, commondir, privatedir)
+        retriever, vectorstore = rag.initialize_ParentDocumentRetriever(dbpath, commondir, privatedir)
 
         #終了時メモリ書き込みを登録
         atexit.register(self.memorize)
