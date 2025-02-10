@@ -7,6 +7,7 @@ import mem
 import threading
 import datetime
 import atexit
+import configparser
 
 #曜日の名前をリストで定義
 WEEKDAYS = ['月曜日', '火曜日', '水曜日', '木曜日', '金曜日', '土曜日', '日曜日']
@@ -51,8 +52,18 @@ class ELYZA:
         self.memory = mem.initialize(100)
         self.memory.human_prefix = 'あなた'
         self.memory.ai_prefix = 'まう'
-        # self.retriever = rag.initialize('./data/ppe.db', './data', './mem')
-        self.retriever, self.vectorstore = rag.initialize_ParentDocumentRetriever('./data/ppe.db', './data',  './mem')
+
+        # パスを設定ファイルから取得
+        config = configparser.ConfigParser()
+        config.read('settings.ini')
+
+        # 設定値の取得
+        self.dbpath = config['Directory']['DBPath']
+        self.commondir = config['Directory']['Common']
+        self.privatedir = config['Directory']['Private']
+
+        # self.retriever = rag.initialize(self.dbpath, self.commondir, self.privatedir)
+        self.retriever, self.vectorstore = rag.initialize_ParentDocumentRetriever(self.dbpath, self.commondir, self.privatedir)
 
         #終了時メモリ書き込みを登録
         atexit.register(self.memorize)
@@ -165,7 +176,7 @@ class ELYZA:
 
     def memorize (self):
         #メモリに書き込む
-        mem.save(self.memory, './mem/memory.txt')
+        mem.save(self.memory, self.privatedir + '/memory.txt')
 
 if __name__ == '__main__':
     llm_model = ELYZA()

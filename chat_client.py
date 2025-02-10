@@ -24,12 +24,12 @@ class chat_clt:
         config.read('settings.ini')
 
         # 設定値の取得
-        dbpath = config['Directory']['DBPath']
-        commondir = config['Directory']['Common']
-        privatedir = config['Directory']['Private']
+        self.dbpath = config['Directory']['DBPath']
+        self.commondir = config['Directory']['Common']
+        self.privatedir = config['Directory']['Private']
 
         # retriever = rag.initialize(dbpath, commondir, privatedir)
-        retriever, vectorstore = rag.initialize_ParentDocumentRetriever(dbpath, commondir, privatedir)
+        self.retriever, self.vectorstore = rag.initialize_ParentDocumentRetriever(self.dbpath, self.commondir, self.privatedir)
 
         #終了時メモリ書き込みを登録
         atexit.register(self.memorize)
@@ -75,7 +75,7 @@ class chat_clt:
 
     def memorize (self):
         #メモリに書き込む
-        mem.save(self.memory, './mem/memory.txt')
+        mem.save(self.memory, self.privatedir + '/memory.txt')
 
     def send_receive(self, url, prompt, text):
         self.send_message(url, prompt, text)
