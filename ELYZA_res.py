@@ -12,10 +12,10 @@ import configparser
 #曜日の名前をリストで定義
 WEEKDAYS = ['月曜日', '火曜日', '水曜日', '木曜日', '金曜日', '土曜日', '日曜日']
 
-DEFAULT_SYSTEM_PROMPT = 'あなたの名前はまうです。あなたの年齢は20歳です。 受付をしている女性です。 特に指示が無い場合は、「まう」というキャラクターとして常に日本語で親しい間柄のフレンドリーな感じで回答してください。\n'
-DEFAULT_SYSTEM_PROMPT2 = '以下のコンテキストも参照して回答してください。\nコンテキスト：'
-DEFAULT_SYSTEM_PROMPT3 = '以下の会話履歴も参考に回答してください。 \n会話：'
-DEFAULT_SYSTEM_PROMPT4 = '目の前に見えている景色も参考に回答してください。\n見えている景色：'
+DEFAULT_SYSTEM_PROMPT = '###あなたの名前はまうです。あなたの年齢は20歳です。 受付をしている女性です。 特に指示が無い場合は、「まう」というキャラクターとして常に日本語で親しい間柄のフレンドリーな感じで回答してください。\n'
+DEFAULT_SYSTEM_PROMPT2 = '###以下のコンテキストも参照して回答してください。\nコンテキスト："""'
+DEFAULT_SYSTEM_PROMPT3 = '###以下の会話履歴も参考に回答してください。 \n会話："""'
+DEFAULT_SYSTEM_PROMPT4 = '###目の前に見えている景色も参考に回答してください。\n見えている景色："""'
 
 quantization_config = BitsAndBytesConfig(
     load_in_4bit=True,
@@ -63,7 +63,7 @@ class ELYZA:
         self.privatedir = config['Directory']['Private']
 
         # self.retriever = rag.initialize(self.dbpath, self.commondir, self.privatedir)
-        self.retriever, self.vectorstore = rag.initialize_ParentDocumentRetriever(self.dbpath, self.commondir, self.privatedir)
+        self.retriever = rag.initialize_ParentDocumentRetriever(self.dbpath, self.commondir, self.privatedir)
 
         #終了時メモリ書き込みを登録
         atexit.register(self.memorize)
@@ -151,15 +151,15 @@ class ELYZA:
         #context = rag.create_context(db, text)
         context = rag.create_context(retriever, output)
         if context != '':
-            def_prompt += (DEFAULT_SYSTEM_PROMPT2 + context + '\n')
+            def_prompt += (DEFAULT_SYSTEM_PROMPT2 + context + '\n"""')
 
         #会話履歴をプロンプトに設定する
         buffer = mem.load(memory)
-        def_prompt += (DEFAULT_SYSTEM_PROMPT3 + buffer['history'])
+        def_prompt += (DEFAULT_SYSTEM_PROMPT3 + buffer['history'] + '\n"""')
 
         #画像コメントを読み込む
         if self.img_comment != '':
-            def_prompt += (DEFAULT_SYSTEM_PROMPT4 + self.img_comment + '\n')
+            def_prompt += (DEFAULT_SYSTEM_PROMPT4 + self.img_comment + '\n"""')
 
         #回答を得る
         output = self.base_response(def_prompt, text)

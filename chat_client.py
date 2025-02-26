@@ -8,9 +8,9 @@ import configparser
 #曜日の名前をリストで定義
 WEEKDAYS = ['月曜日', '火曜日', '水曜日', '木曜日', '金曜日', '土曜日', '日曜日']
 
-#DEFAULT_SYSTEM_PROMPT = 'あなたの名前はまうです。あなたの年齢は20歳です。 受付をしている女性です。 特に指示が無い場合は、「まう」というキャラクターとして常に日本語で親しい間柄の感じで回答してください。\n'
-DEFAULT_SYSTEM_PROMPT2 = '以下のコンテキストも参照して回答してください。\nコンテキスト：'
-DEFAULT_SYSTEM_PROMPT3 = '以下の会話履歴も参考に回答してください。 \n会話：'
+#DEFAULT_SYSTEM_PROMPT = '###あなたの名前はまうです。あなたの年齢は20歳です。 受付をしている女性です。 特に指示が無い場合は、「まう」というキャラクターとして常に日本語で親しい間柄の感じで回答してください。\n'
+DEFAULT_SYSTEM_PROMPT2 = '###以下のコンテキストも参照して回答してください。\n###コンテキスト："""'
+DEFAULT_SYSTEM_PROMPT3 = '###以下の会話履歴も参考に回答してください。 \n###会話："""'
 
 class chat_clt:
     def __init__(self):
@@ -29,7 +29,7 @@ class chat_clt:
         self.privatedir = config['Directory']['Private']
 
         # retriever = rag.initialize(dbpath, commondir, privatedir)
-        self.retriever, self.vectorstore = rag.initialize_ParentDocumentRetriever(self.dbpath, self.commondir, self.privatedir)
+        self.retriever = rag.initialize_ParentDocumentRetriever(self.dbpath, self.commondir, self.privatedir)
 
         #終了時メモリ書き込みを登録
         atexit.register(self.memorize)
@@ -53,11 +53,11 @@ class chat_clt:
         #検索したコンテキストをプロンプトに設定する
         context = rag.create_context(retriever, text)
         if context != '':
-            def_prompt += (DEFAULT_SYSTEM_PROMPT2 + context + '\n')
+            def_prompt += (DEFAULT_SYSTEM_PROMPT2 + context + '\n"""')
 
         #会話履歴をプロンプトに設定する
         buffer = mem.load(memory)
-        def_prompt += (DEFAULT_SYSTEM_PROMPT3 + buffer['history'])
+        def_prompt += (DEFAULT_SYSTEM_PROMPT3 + buffer['history'] + '\n"""')
 
         #回答を得る
 #        output = self.ELYZA_srv.base_response(def_prompt, text)

@@ -6,7 +6,7 @@
 from trafilatura import fetch_url, extract
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig, pipeline
 from langchain.chains import LLMChain, RetrievalQA, SimpleSequentialChain
-from langchain.retrievers import ParentDocumentRetriever, MultiVectorRetriever
+from langchain.retrievers import ParentDocumentRetriever, MultiVectorRetriever, BM25Retriever, EnsembleRetriever
 from langchain.schema import Document
 from langchain.schema.embeddings import Embeddings
 from langchain.storage import InMemoryStore
@@ -30,8 +30,11 @@ from langchain_text_splitters import TokenTextSplitter, CharacterTextSplitter, R
 import configparser
 
 import os
-from typing import Any
+from typing import Any, List
 import uuid
+
+from sudachipy import tokenizer
+from sudachipy import dictionary
 
 class JapaneseCharacterTextSplitter(RecursiveCharacterTextSplitter):
     def __init__(self, **kwargs: Any):
@@ -79,6 +82,23 @@ def append_loaders_list(loaders_list, dir):
     loaders_list.append (create_directory_loader('.xml', dir))
     loaders_list.append (create_directory_loader('.md', dir))
 
+def text_split(documents):
+    # text_splitter = CharacterTextSplitter.from_tiktoken_encoder(
+    #     separator = '\n',
+    #     chunk_size = 300,
+    #     chunk_overlap = 20
+    # )
+
+    text_splitter = RecursiveCharacterTextSplitter(
+        separators=["\n", "。"],
+        chunk_size = 300,
+        chunk_overlap = 20
+    )
+
+    texts = text_splitter.split_documents(documents)
+
+    return texts
+
 def initialize(dbpath, commondir, privatedir):
     embeddings = HuggingFaceEmbeddings(model_name = 'intfloat/multilingual-e5-large')
     # #do有無の確認
@@ -107,14 +127,16 @@ def initialize(dbpath, commondir, privatedir):
     #     chunk_overlap = 20
     # )
 
-    text_splitter = RecursiveCharacterTextSplitter(
-        separators = ['\n', '。'],
-        chunk_size = 300,
-        chunk_overlap = 20,
-    )
+    # text_splitter = RecursiveCharacterTextSplitter(
+    #     separators = ['\n', '。'],
+    #     chunk_size = 300,
+    #     chunk_overlap = 20,
+    # )
 
-    texts = text_splitter.split_documents(documents)
-    #print(len(texts))
+    # texts = text_splitter.split_documents(documents)
+    # #print(len(texts))
+
+    texts = text_split(documents)
 
     db = FAISS.from_documents(texts, embeddings)
     #距離尺度をコサイン類似度にする
@@ -177,8 +199,56 @@ def initialize_ParentDocumentRetriever(dbpath, commondir, privatedir):
     #Add texts
     retriever.add_documents(documents, ids=None)
 
-    return retriever, vectorstore
- 
+    return retriever
+
+def split_text_by_bytes(text, max_bytes=49149):
+    # バイト単位でテキストを分割
+    encoded_text = text.encode('utf-8')
+    chunks = []
+    for i in range(0, len(encoded_text), max_bytes):
+        chunk = encoded_text[i:i+max_bytes]
+        chunks.append(chunk.decode('utf-8', errors='ignore'))
+
+    return chunks
+
+# トークン化関数の準備
+def preprocess_func(text: str)-> List[str]:
+    tokenizer_obj = dictionary.Dictionary(dict='full').create()
+    mode = tokenizer.Tokenizer.SplitMode.A
+
+    # テキストを分割してトークン化
+    words = set()
+    for chunk in split_text_by_bytes(text):
+        tokens = tokenizer_obj.tokenize(chunk, mode)
+        words.update(token.surface() for token in tokens)
+
+    return list(words)
+
+# BM25Retrieverの準備
+def initialize_bm25_retriever(dppath, commondir, privatedir):
+    # Create DictionaryLoader instances for each file type
+    loaders_list = []
+    append_loaders_list(loaders_list, commondir)
+    append_loaders_list(loaders_list, privatedir)
+
+    # フォルダからファイルをロードする
+    documents = []
+    for loader in loaders_list:
+        # Use UnstructureFileLoader to load each file
+        # pip uninstall python-magic
+        # pip install python-magic-bin==0.4.14
+        # pip install python-pptx
+        docs = loader.load()
+        documents.extend(docs)
+        documents = text_split(documents)
+        texts = [doc.page_content for doc in documents]
+
+        return BM25Retriever.from_texts(
+            texts,
+            preproess_func=preprocess_func,
+            k=3
+        )
+
 def create_context(retriever, text):
     #一致度
     found_docs = retriever.invoke(text)
@@ -282,7 +352,20 @@ def response (retriever, model, tokenizer, text):
 
     output = qa.invoke (text)
 
-    return output 
+    return output
+
+def initialize_EnsembleRetriever(dppath, commondir, privatedir):
+    FAISSRetriever = initialize(dppath, commondir, privatedir)
+    parentRetriever = initialize_ParentDocumentRetriever(dppath, commondir, privatedir)
+    bm25Retriever = initialize_bm25_retriever(dppath, commondir, privatedir)
+
+    # Retrieverの準備
+    retriever = EnsembleRetriever(
+        retrievers = [FAISSRetriever, parentRetriever, bm25Retriever],
+        weights = [0.25, 0.5, 0.25]
+    )
+
+    return retriever
 
 if __name__ == '__main__':
     # パスを設定ファイルから取得
@@ -295,7 +378,9 @@ if __name__ == '__main__':
     privatedir = config['Directory']['Private']
 
     # retriever = initialize(dbpath, commondir, privatedir)
-    retriever, vectorstore = initialize_ParentDocumentRetriever(dbpath, commondir, privatedir)
+    # retriever = initialize_ParentDocumentRetriever(dbpath, commondir, privatedir)
+    # retriever = initialize_bm25_retriever(dbpath, commondir, privatedir)
+    retriever = initialize_EnsembleRetriever(dbpath, commondir, privatedir)
 
     while(True):
         text = input('?(qで終了):')
